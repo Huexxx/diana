@@ -183,8 +183,10 @@ static int suspend_enter(suspend_state_t state)
 
 	error = sysdev_suspend(PMSG_SUSPEND);
 	if (!error) {
-		if (!suspend_test(TEST_CORE))
+		if (!suspend_test(TEST_CORE) && pm_check_wakeup_events()) {
 			error = suspend_ops->enter(state);
+			events_check_enabled = false;
+		}
 // LGE_UPDATE_S
 #if defined(CONFIG_WAKE_IRQ_PRINT)
 		wakeup_irq_record_reset();
