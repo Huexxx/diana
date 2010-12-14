@@ -219,7 +219,7 @@ int dvb_usb_remote_init(struct dvb_usb_device *d)
 int dvb_usb_remote_exit(struct dvb_usb_device *d)
 {
 	if (d->state & DVB_USB_STATE_REMOTE) {
-		cancel_rearming_delayed_work(&d->rc_query_work);
+		cancel_delayed_work_sync(&d->rc_query_work);
 		flush_scheduled_work();
 		input_unregister_device(d->rc_input_dev);
 	}
