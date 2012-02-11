@@ -113,3 +113,4 @@ lib/gen_crc32table
 scripts/kconfig/mconf
 usr/gen_init_cpio
 usr/initramfs_data.cpio
+diana*

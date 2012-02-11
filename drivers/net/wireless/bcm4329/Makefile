@@ -51,7 +51,7 @@ EXTRA_CFLAGS = \
 	-DDHD_GPL \
 	-DBCMLXSDMMC \
 	-DBCMPLATFORM_BUS \
-	-Wall -Wstrict-prototypes -Werror \
+	-Wall -Wstrict-prototypes \
 	-I$(SRCROOT) \
 	-I$(SRCROOT)/include \
 	-I$(SRCROOT)/shared \
@@ -122,4 +122,7 @@ EXTRA_CFLAGS += -DNOT_MSM_CPU
 EXTRA_CFLAGS += -DPKT_FILTER_SUPPORT
 EXTRA_CFLAGS += -DARP_OFFLOAD_SUPPORT
 EXTRA_CFLAGS += -DEMBEDDED_PLATFORM
+
+# Try to reduce module size (Huexxx)
+EXTRA CFLAGS += -Os
 
