@@ -24,6 +24,10 @@
 #include <linux/earlysuspend.h>
 #endif
 
+static int dimming_enabled = 1;
+module_param(dimming_enabled, int, 0600);
+MODULE_PARM_DESC(dimming_enabled, "Enable led dimming after timeout.");
+
 #define MODULE_NAME   "led-bd2802"
 
 #ifndef DEBUG
@@ -58,11 +62,11 @@
 #define BD2812_DCDCDRIVER		0x40
 #define BD2812_PIN_FUNC_SETUP		0x41
 
-#define BD2802_CURRENT_WHITE_PEAK	0x5A /* 18mA */
-#define BD2802_CURRENT_WHITE_MAX	0x32 /* 10mA */
-#define BD2802_CURRENT_BLUE_MAX		0x32 /* 10mA */
-#define BD2802_CURRENT_WHITE_MIN	0x05 /* 1mA */
-#define BD2802_CURRENT_BLUE_MIN		0x05 /* 1mA */
+#define BD2802_CURRENT_WHITE_PEAK	0x48 /* 18mA (5A) -> 14.4mA (48) */
+#define BD2802_CURRENT_WHITE_MAX	0x28 /* 10mA (32) -> 8mA (28) */
+#define BD2802_CURRENT_BLUE_MAX		0x28 /* 10mA (32) -> 8mA (28) */
+#define BD2802_CURRENT_WHITE_MIN	0x04 /* 1mA (05) -> 0.8mA (04) */
+#define BD2802_CURRENT_BLUE_MIN		0x04 /* 1mA (05) -> 0.8mA (04) */
 #define BD2802_CURRENT_000		0x00 /* 0.0mA */
 
 #define BD2802_PATTERN_FULL		0x0F
@@ -405,7 +409,6 @@ void touchkey_pressed(enum key_leds id)
 		bd2802_on(led);
 		led->led_state = BD2802_ON;
 	}
-	/* LGE_UPDATE_S 2011-10-26 [daewung.kim@lge.com] : Turn off LED backlight for power consumption */
 	else if (led->led_state == BD2802_OFF) {
 		led->white_current = BD2802_CURRENT_WHITE_MAX;
 		led->blue_current = BD2802_CURRENT_000;	
@@ -413,7 +416,6 @@ void touchkey_pressed(enum key_leds id)
 		bd2802_on(led);
 		bd2802_enable(led);
 	}
-	/* LGE_UPDATE_E 2011-10-26 [daewung.kim@lge.com] : Turn off LED backlight for power consumption */
 
 	if (led->key_led != id)
 		bd2802_turn_white(led,led->key_led);
@@ -552,15 +554,13 @@ static void bd2802_ledmin_work_func(struct work_struct *work)
 	struct bd2802_led *led = container_of(work, struct bd2802_led, ledmin_work);
 	led->white_current = BD2802_CURRENT_WHITE_MIN;
 	led->blue_current = BD2802_CURRENT_000;
-/* LGE_UPDATE_S 2011-10-26 [daewung.kim@lge.com] : Turn off LED backlight for power consumption */
-#if 0
-	bd2802_on(led);
-	led->led_state = BD2802_DIMMING;
-#else
-	bd2802_off(led);
-	led->led_state = BD2802_OFF;
-#endif
-/* LGE_UPDATE_E 2011-10-26 [daewung.kim@lge.com] : Turn off LED backlight for power consumption */
+	if (unlikely(dimming_enabled)) {
+		bd2802_on(led);
+		led->led_state = BD2802_DIMMING;
+	} else {
+		bd2802_off(led);
+		led->led_state = BD2802_OFF;
+	}
 }
 
 static enum hrtimer_restart bd2802_ledmin_timer_func(struct hrtimer *timer)
