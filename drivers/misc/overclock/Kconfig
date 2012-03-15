@@ -1,0 +1,13 @@
+menu "Overclock"
+
+config OPPTIMIZER
+	tristate "Opptimizer"
+	depends on ARCH_OMAP3
+        default m
+
+config OVERCLOCK
+	tristate "Overclock"
+	depends on ARCH_OMAP3
+        default m
+
+endmenu

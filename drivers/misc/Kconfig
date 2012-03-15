@@ -478,6 +478,8 @@ source "drivers/misc/iwmc3200top/Kconfig"
 source "drivers/misc/ti-st/Kconfig"
 # LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver 
 source "drivers/misc/mpu3050/Kconfig"
-# LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver 
+# LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-01-28, Porting for Sensor Driver
+source "drivers/misc/symsearch/Kconfig"
+source "drivers/misc/overclock/Kconfig"
 
 endif # MISC_DEVICES
