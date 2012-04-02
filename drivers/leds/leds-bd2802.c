@@ -28,6 +28,18 @@ static int dimming_enabled = 1;
 module_param(dimming_enabled, int, 0600);
 MODULE_PARM_DESC(dimming_enabled, "Enable led dimming after timeout.");
 
+static int max_current = 20;
+module_param(max_current, int, 0600);
+MODULE_PARM_DESC(max_current, "Max current value / 0.2mA.");
+
+static int min_current = 2;
+module_param(min_current, int, 0600);
+MODULE_PARM_DESC(min_current, "Min current value / 0.2mA.");
+
+static int led_timer = 2;
+module_param(led_timer, int, 0600);
+MODULE_PARM_DESC(led_timer, "Seconds at max current.");
+
 #define MODULE_NAME   "led-bd2802"
 
 #ifndef DEBUG
@@ -62,11 +74,11 @@ MODULE_PARM_DESC(dimming_enabled, "Enable led dimming after timeout.");
 #define BD2812_DCDCDRIVER		0x40
 #define BD2812_PIN_FUNC_SETUP		0x41
 
-#define BD2802_CURRENT_WHITE_PEAK	0x48 /* 18mA (5A) -> 14.4mA (48) */
-#define BD2802_CURRENT_WHITE_MAX	0x28 /* 10mA (32) -> 8mA (28) */
-#define BD2802_CURRENT_BLUE_MAX		0x28 /* 10mA (32) -> 8mA (28) */
-#define BD2802_CURRENT_WHITE_MIN	0x04 /* 1mA (05) -> 0.8mA (04) */
-#define BD2802_CURRENT_BLUE_MIN		0x04 /* 1mA (05) -> 0.8mA (04) */
+#define BD2802_CURRENT_WHITE_PEAK	0x5A /* 18mA */
+#define BD2802_CURRENT_WHITE_MAX	0x32 /* 10mA */
+#define BD2802_CURRENT_BLUE_MAX		0x32 /* 10mA */
+#define BD2802_CURRENT_WHITE_MIN	0x05 /* 1mA */
+#define BD2802_CURRENT_BLUE_MIN		0x05 /* 1mA */
 #define BD2802_CURRENT_000		0x00 /* 0.0mA */
 
 #define BD2802_PATTERN_FULL		0x0F
@@ -404,13 +416,13 @@ void touchkey_pressed(enum key_leds id)
 	hrtimer_cancel(&led->ledmin_timer);
 
 	if (led->led_state == BD2802_DIMMING) {
-		led->white_current = BD2802_CURRENT_WHITE_MAX;
+		led->white_current = max_current;
 		led->blue_current = BD2802_CURRENT_000;	
 		bd2802_on(led);
 		led->led_state = BD2802_ON;
 	}
 	else if (led->led_state == BD2802_OFF) {
-		led->white_current = BD2802_CURRENT_WHITE_MAX;
+		led->white_current = max_current;
 		led->blue_current = BD2802_CURRENT_000;	
 		led->led_state = BD2802_ON;
 		bd2802_on(led);
@@ -423,7 +435,7 @@ void touchkey_pressed(enum key_leds id)
 	led->key_led=id;
 	DBG("led->key_led =%d\n",led->key_led);
 
-	led->blue_current = BD2802_CURRENT_BLUE_MAX;
+	led->blue_current = max_current;
 	bd2802_turn_blue(led, led->key_led);
 	bd2802_turn_blue(led, HIDDEN1);
 	bd2802_turn_blue(led, HIDDEN2);
@@ -518,7 +530,7 @@ static enum hrtimer_restart bd2802_timer_func(struct hrtimer *timer)
 	{
 		if (((led->led_counter)%9)==0)
 		//if(((led->key_led==HOME)&&(led->key_direction==BACKWARD))||((led->key_led==BACK)&&(led->key_direction==FORWARD)))
-			hrtimer_start(&led->timer, ktime_set(1,000000000), HRTIMER_MODE_REL); /* 1 sec */
+			hrtimer_start(&led->timer, ktime_set(1, 000000000), HRTIMER_MODE_REL); /* 1 sec */
 		else
 			hrtimer_start(&led->timer, ktime_set(0, 110000000), HRTIMER_MODE_REL); /* 1 sec */
 	}
@@ -529,12 +541,12 @@ static enum hrtimer_restart bd2802_timer_func(struct hrtimer *timer)
 static void bd2802_touchkey_work_func(struct work_struct *work)
 {
 	struct bd2802_led *led = container_of(work, struct bd2802_led, touchkey_work);
-	led->white_current = BD2802_CURRENT_WHITE_MAX;
+	led->white_current = max_current;
 	led->blue_current = BD2802_CURRENT_000;
 	bd2802_turn_white(led,led->key_led);
 	bd2802_turn_blue(led,HIDDEN1);
 	bd2802_turn_blue(led,HIDDEN2);
-	hrtimer_start(&led->ledmin_timer, ktime_set(5, 0), HRTIMER_MODE_REL);
+	hrtimer_start(&led->ledmin_timer, ktime_set(led_timer, 0), HRTIMER_MODE_REL);
 }
 
 static enum hrtimer_restart bd2802_touchkey_timer_func(struct hrtimer *timer)
@@ -552,7 +564,7 @@ static enum hrtimer_restart bd2802_touchkey_timer_func(struct hrtimer *timer)
 static void bd2802_ledmin_work_func(struct work_struct *work)
 {
 	struct bd2802_led *led = container_of(work, struct bd2802_led, ledmin_work);
-	led->white_current = BD2802_CURRENT_WHITE_MIN;
+	led->white_current = min_current;
 	led->blue_current = BD2802_CURRENT_000;
 	if (unlikely(dimming_enabled)) {
 		bd2802_on(led);
@@ -674,33 +686,33 @@ static ssize_t bd2802_store_led_start(struct device *dev,
 		led->led_state = BD2802_SEQ;
 
 #if defined(BLINK_ON_BOOTING)
-		led->white_current = BD2802_CURRENT_WHITE_MAX;
-	    led->blue_current = BD2802_CURRENT_000;
-	    led->blink_enable = 1;
-	    bd2802_configure(led);
-	    bd2802_on(led);
+		led->white_current = max_current;
+		led->blue_current = BD2802_CURRENT_000;
+		led->blink_enable = 1;
+		bd2802_configure(led);
+		bd2802_on(led);
 #else
-		led->blue_current = BD2802_CURRENT_BLUE_MAX;
+		led->blue_current = max_current;
 		hrtimer_start(&led->timer, ktime_set(0, 800000000), HRTIMER_MODE_REL); /* 0.8 sec */
 #endif	// BLINK_ON_BOOTING
 	}
 	else if (value==0)
 	{
-            #if defined(BLINK_ON_BOOTING)
-	    led->led_state=BD2802_ON;
-	    led->white_current = BD2802_CURRENT_WHITE_MAX;
-	    led->blue_current = BD2802_CURRENT_000;
-	    led->blink_enable=0;
-	    bd2802_sw_reset(led);
-	    bd2802_reset_cancel(led);
-	    bd2802_on(led);
-	    bd2802_enable(led);
-		hrtimer_start(&led->ledmin_timer, ktime_set(5, 0), HRTIMER_MODE_REL); //+DEJA
-            #else 
-	    led->led_state=BD2802_SEQ_END;
-	    led->blue_current = BD2802_CURRENT_000;
-	    hrtimer_start(&led->ledmin_timer, ktime_set(10, 0), HRTIMER_MODE_REL);
-            #endif
+#if defined(BLINK_ON_BOOTING)
+		led->led_state=BD2802_ON;
+		led->white_current = max_current;
+		led->blue_current = BD2802_CURRENT_000;
+		led->blink_enable=0;
+		bd2802_sw_reset(led);
+		bd2802_reset_cancel(led);
+		bd2802_on(led);
+		bd2802_enable(led);
+		hrtimer_start(&led->ledmin_timer, ktime_set(led_timer, 0), HRTIMER_MODE_REL); //+DEJA
+#else 
+		led->led_state=BD2802_SEQ_END;
+		led->blue_current = BD2802_CURRENT_000;
+		hrtimer_start(&led->ledmin_timer, ktime_set(10, 0), HRTIMER_MODE_REL);
+#endif
 	}
 	else
 	{
@@ -727,8 +739,8 @@ static ssize_t bd2802_store_led_onoff(struct device *dev,
 	if ((value==1)&&(led->led_state!=BD2802_ON))
 	{
 		led->led_state = BD2802_ON;
-		led->white_current = BD2802_CURRENT_WHITE_MAX;
-	    led->blue_current = BD2802_CURRENT_000;
+		led->white_current = max_current;
+	        led->blue_current = BD2802_CURRENT_000;
 		led->blink_enable=0;
 		bd2802_reset_cancel(led);
 		bd2802_on(led);
@@ -738,15 +750,15 @@ static ssize_t bd2802_store_led_onoff(struct device *dev,
 	{
 		bd2802_off(led);
 		gpio_set_value(RGB_LED_CNTL, 0);
-	    led->led_state=BD2802_OFF;
+		led->led_state=BD2802_OFF;
 	}
 	else
 	{
-	    if (value > 1)
-	    {
-		return -EINVAL;
-		DBG("Value is not valid\n");
-	}
+	    	if (value > 1)
+	    	{
+			return -EINVAL;
+			DBG("Value is not valid\n");
+		}
 	}
 
 	return count;
@@ -768,27 +780,27 @@ static ssize_t bd2802_store_led_testmode(struct device *dev,
 	if ((value==1)&&(led->led_state!=BD2802_TEST_ON))
 	{
 		led->led_state=BD2802_TEST_ON;
-		led->white_current = BD2802_CURRENT_WHITE_MAX;
+		led->white_current = max_current;
 		led->blue_current = BD2802_CURRENT_000;
 		bd2802_reset_cancel(led);
 		bd2802_on(led);
 		bd2802_enable(led);
-	    DBG("TEST LED ON\n");
+		DBG("TEST LED ON\n");
 	}
 	else if ((value==0)&&(led->led_state!=BD2802_TEST_OFF))
 	{
 		bd2802_off(led);
 		gpio_set_value(RGB_LED_CNTL, 0);
-	    led->led_state=BD2802_TEST_OFF;
-	    DBG("TEST LED OFF\n");
+		led->led_state=BD2802_TEST_OFF;
+		DBG("TEST LED OFF\n");
 	}
 	else
 	{
-	    if (value > 1)
-	    {
-		return -EINVAL;
-		DBG("Value is not valid\n");
-	}
+	    	if (value > 1)
+	    	{
+			return -EINVAL;
+			DBG("Value is not valid\n");
+		}
 	}
 
 	return count;
@@ -821,11 +833,11 @@ static ssize_t bd2802_store_led_sync(struct device *dev,
 		}
 	} else if(value == 0) {
 		if(led->led_state == BD2802_SYNC) {
-			led->white_current = BD2802_CURRENT_WHITE_MAX;
+			led->white_current = max_current;
 			led->blue_current = BD2802_CURRENT_000;
 			bd2802_on(led);
 			led->led_state = BD2802_ON;
-			hrtimer_start(&led->ledmin_timer, ktime_set(5, 0), HRTIMER_MODE_REL);
+			hrtimer_start(&led->ledmin_timer, ktime_set(led_timer, 0), HRTIMER_MODE_REL);
 		}
 	} else {
 		return -EINVAL;
@@ -1030,7 +1042,7 @@ static int bd2802_bl_resume(struct i2c_client *client)
 	DBG("\n");
 	
 	led->led_state = BD2802_ON;
-	led->white_current = BD2802_CURRENT_WHITE_MAX;
+	led->white_current = max_current;
 	led->blue_current = BD2802_CURRENT_000;
 /*	if (system_rev >=4) //OVER REV.D
 	{
@@ -1041,7 +1053,7 @@ static int bd2802_bl_resume(struct i2c_client *client)
 	bd2802_enable(led);
 
 	//hrtimer_start(&led->touchkey_timer, ktime_set(0, 500000000), HRTIMER_MODE_REL); /*5 sec */
-	hrtimer_start(&led->ledmin_timer, ktime_set(5, 0), HRTIMER_MODE_REL);
+	hrtimer_start(&led->ledmin_timer, ktime_set(led_timer, 0), HRTIMER_MODE_REL);
 	return 0;
 }
 
@@ -1119,11 +1131,11 @@ static int __devinit bd2802_probe(struct i2c_client *client,
 	led->key_direction= FORWARD;
 	led->led_counter=0;
 #if defined(BLINK_ON_BOOTING)
-	led->white_current = BD2802_CURRENT_WHITE_MAX;
+	led->white_current = max_current;
 	led->blue_current = BD2802_CURRENT_000;
 #else
-	led->white_current = BD2802_CURRENT_WHITE_MAX;
-	led->blue_current = BD2802_CURRENT_BLUE_MAX;
+	led->white_current = max_current;
+	led->blue_current = max_current;
 #endif
 
 	init_rwsem(&led->rwsem);
