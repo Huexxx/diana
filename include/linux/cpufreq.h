@@ -451,4 +451,11 @@ extern void cpufreq_debug_printk(unsigned int type, const char *prefix,
 
 #endif /* CONFIG_CPU_FREQ_DEBUG */
 
+
+/*********************************************************************
+ *                     STATS UPDATE HELPERS                          *
+ *********************************************************************/
+	
+int cpufreq_stats_update_freq_table(struct cpufreq_frequency_table *table, unsigned int cpu);
+
 #endif /* _LINUX_CPUFREQ_H */
