@@ -1302,6 +1302,10 @@ static struct platform_device *hub_devices[] __initdata = {
 /* sudhir end*/	
 #endif
 };
+static void hub_mcbsp_init(void)
+{
+	omap3_mux_config("OMAP_MCBSP2_SLAVE");
+}
 
 /* sunggyun.yu@lge.com for GPIO_126, 127, 129 */
 static void __init hub_mmc1_gpio_init(void)
@@ -1442,7 +1446,7 @@ void __init hub_peripherals_init(void)
 	platform_add_devices(hub_devices, ARRAY_SIZE(hub_devices));
 
 	hub_synaptics_dev_init(); // 20100619 jh.koo@lge.com Hub touchscreen
-
+	hub_mcbsp_init();
 /* LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-03-03, Porting for MPLv3.3.3 */
 #if defined(CONFIG_MPU_SENSORS_MPU3050) || defined(CONFIG_MPU_SENSORS_MPU3050_MODULE)
 	mpu3050_dev_init();

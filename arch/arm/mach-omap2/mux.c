@@ -301,7 +301,7 @@ int omap3_mux_config(char *group)
 		omap_mux_init_signal("mcbsp2_dr.mcbsp2_dr",
 						OMAP_PIN_INPUT);
 		omap_mux_init_signal("mcbsp2_dx.mcbsp2_dx",
-						OMAP_PIN_OUTPUT);
+						OMAP_PIN_OUTPUT | OMAP_PULL_ENA);
 		return 0;
 	} else if (strcmp(group, "OMAP_MCBSP3_SLAVE") == 0) {
 		omap_mux_init_signal("mcbsp3_fsx.mcbsp3_fsx",

@@ -1337,6 +1337,14 @@ static void twl4030_bci_battery_read_status(struct twl4030_bci_device_info *di)
 	/* Read Battery Status */
 	di->temp_C = twl4030battery_temperature();		// Read Temperature
 	di->battery_present = check_battery_present();		// Set Battery Present
+	if (di->temp_C >600)
+	{
+        msleep(500);
+        printk("[BATTERY] When suddenly OverTemp. temp_C : %d \n", di->temp_C);
+        di->temp_C = twl4030battery_temperature();
+        printk("[BATTERY] When suddenly OverTemp. retry temp_C : %d \n", di->temp_C);
+    }
+	
 #ifdef FUELGAUGE_AP_ONLY
 	if(di->battery_present) {			// Adjust RCOMP for fuelgauge(Rev.D)
 #else
@@ -1352,6 +1360,13 @@ static void twl4030_bci_battery_read_status(struct twl4030_bci_device_info *di)
 	di->current_uA = 0;
 #else
 	di->temp_C = twl4030battery_temperature();
+	if (di->temp_C >600)
+	{
+        msleep(500);
+        printk("[BATTERY2] When suddenly OverTemp. temp_C : %d \n", di->temp_C);
+        di->temp_C = twl4030battery_temperature();
+        printk("[BATTERY2] When suddenly OverTemp. retry temp_C : %d \n", di->temp_C);
+    }	
 	di->voltage_uV = twl4030battery_voltage();
 	di->current_uA = twl4030battery_current();
 	di->capacity = twl4030battery_capacity(di);
