@@ -443,26 +443,26 @@ static ssize_t overclock_store(struct kobject *k,
 			mpu_freq_table[target_opp_nr].frequency = freq/1000;
 
 			//Fix policy
-			if(target_opp_nr == 0) {
-				mpu_policy->cpuinfo.min_freq = freq/1000;
-				mpu_policy->min = freq/1000;
+			if(help_freq/1000 == mpu_policy->user_policy.min) {
 				mpu_policy->user_policy.min = freq/1000;
-			} 
-#ifdef CONFIG_P970_OPP5_ENABLED
-			else if(target_opp_nr == 4) {
-				mpu_policy->cpuinfo.max_freq = freq/1000;
-				mpu_policy->max = freq/1000;
+			} else if(help_freq/1000 == mpu_policy->user_policy.max) {
 				mpu_policy->user_policy.max = freq/1000;
 			}
-#else
-			else if(target_opp_nr == 3) {
+			if(target_opp_nr == 0) {
+				mpu_policy->cpuinfo.min_freq = freq/1000;
+			} 
+#ifdef CONFIG_P970_OPP5_ENABLED
+			if(target_opp_nr == 4) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
-				mpu_policy->max = freq/1000;
-				mpu_policy->user_policy.max = freq/1000;
+			}
+#else
+			if(target_opp_nr == 3) {
+				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #endif
 
 			opp_enable(temp_opp);
+			cpufreq_update_policy(0);
 
 			//Fix freq_table
 			opp_exit_cpufreq_table(&freq_table);
