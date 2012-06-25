@@ -338,6 +338,8 @@ static struct notifier_block notifier_trans_block = {
 	.notifier_call = cpufreq_stat_notifier_trans
 };
 
+/* Overclock stats update helper */
+#ifdef CONFIG_P970_OVERCLOCK_ENABLED
 int cpufreq_stats_update_freq_table(struct cpufreq_frequency_table *table, unsigned int cpu)
 {
 	unsigned int i;
@@ -355,6 +357,7 @@ int cpufreq_stats_update_freq_table(struct cpufreq_frequency_table *table, unsig
 
 	return 1;
 }
+#endif
 
 static int __init cpufreq_stats_init(void)
 {

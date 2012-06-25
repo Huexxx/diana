@@ -189,6 +189,15 @@ config LGE_LAB3_BOARD
 	---help---
 		Support for LAB3 Device ( Tunning Value, GPIO, etc )
 
+config P970_OVERCLOCK_ENABLED
+	bool "Enable overclocking and voltage control sysfs interfaces"
+	depends on MACH_LGE_HUB_REV_A
+	default n
+
+config P970_OPP5_ENABLED
+	bool "Enable fifth operating point (1.2 GHz)"
+	depends on MACH_LGE_HUB_REV_A
+	default n
 
 config MACH_CM_T35
 	bool "CompuLab CM-T35 module"

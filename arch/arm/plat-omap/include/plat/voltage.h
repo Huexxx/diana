@@ -177,6 +177,11 @@ static inline int omap_voltage_unregister_notifier(
 }
 #endif
 
+#ifdef CONFIG_P970_OVERCLOCK_ENABLED
+int omap_overclock_update_voltage(struct voltagedomain *voltdm,
+	int opp_nr, long new_volt);
+#endif
+
 /* convert volt data to the voltage for the voltage data */
 //LGSI_VS910_FroyoToGB DVFS Patch from DCM shidhar.ms@lge.com_03Oct2011_START
 static inline unsigned long omap_get_operation_voltage(
