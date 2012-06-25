@@ -235,7 +235,11 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 	}
 
 	policy->min = policy->cpuinfo.min_freq;
+#ifdef CONFIG_P970_OPP5_ENABLED
+	policy->max = 1000000;
+#else
 	policy->max = policy->cpuinfo.max_freq;
+#endif
 	policy->cur = omap_getspeed(policy->cpu);
 
 	/* FIXME: what's the actual transition time? */
