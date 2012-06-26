@@ -144,19 +144,36 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 				__raw_readb(ctrl_base + offset + 1) << 8 |
 				__raw_readb(ctrl_base + offset + 2) << 16;
 		} else {
-#ifdef CONFIG_P970_OPP5_ENABLED
-			if (i == 4) {
+/*#ifdef CONFIG_P970_OPP5_ENABLED
+			if (i == 5) {
 				// The hub board does not have an eFuse for OPP5.
 				// We have to calculate a rough approximation of the nValue for this OPP.
 				dev_data->volt_data[i].sr_nvalue = cal_opp5_nvalue(2025, 1750);
-			} else {
+			} else if (i == 0) {
 				dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
 					dev_data->efuse_nvalues_offs[i]);
+			} else {
+				dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
+					dev_data->efuse_nvalues_offs[i-1]);
 			}
 #else
+			if (i == 0) {
+				dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
+					dev_data->efuse_nvalues_offs[i]);
+			} else {
+				dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
+					dev_data->efuse_nvalues_offs[i-1]);
+			}
+#endif*/
+			// Try to get eFUSE values directly after remap them...
 			dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
 				dev_data->efuse_nvalues_offs[i]);
-#endif
+
+			// Log eFUSE values to debug ...
+			printk("%s: dom %s[%d]: using eFUSE ntarget 0x%08X\n",
+				__func__,
+				dev_data->vdd_name, i,
+				dev_data->volt_data[i].sr_nvalue);
 		}
 	}
 	if (cpu_is_omap44xx())

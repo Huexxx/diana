@@ -218,7 +218,8 @@ static ssize_t overclock_vdd_show(struct kobject *, struct kobj_attribute *,
 static ssize_t overclock_vdd_store(struct kobject *k, struct kobj_attribute *,
 			  const char *buf, size_t n);
 
-
+static struct kobj_attribute overclock_vdd_opp0_attr =
+    __ATTR(overclock_vdd_opp0, 0644, overclock_vdd_show, overclock_vdd_store);
 static struct kobj_attribute overclock_vdd_opp1_attr =
     __ATTR(overclock_vdd_opp1, 0644, overclock_vdd_show, overclock_vdd_store);
 static struct kobj_attribute overclock_vdd_opp2_attr =
@@ -268,21 +269,24 @@ static ssize_t overclock_vdd_show(struct kobject *kobj,
 	if(!mpu_dev || !mpu_freq_table)
 		return -EINVAL;
 
-	if ( attr == &overclock_vdd_opp1_attr) {
+	if ( attr == &overclock_vdd_opp0_attr) {
 		target_opp = 0;
 	}
-	if ( attr == &overclock_vdd_opp2_attr) {
+	if ( attr == &overclock_vdd_opp1_attr) {
 		target_opp = 1;
 	}
-	if ( attr == &overclock_vdd_opp3_attr) {
+	if ( attr == &overclock_vdd_opp2_attr) {
 		target_opp = 2;
 	}
-	if ( attr == &overclock_vdd_opp4_attr) {
+	if ( attr == &overclock_vdd_opp3_attr) {
 		target_opp = 3;
+	}
+	if ( attr == &overclock_vdd_opp4_attr) {
+		target_opp = 4;
 	}
 #ifdef CONFIG_P970_OPP5_ENABLED
 	if ( attr == &overclock_vdd_opp5_attr) {
-		target_opp = 4;
+		target_opp = 5;
 	}
 #endif
 
@@ -319,29 +323,34 @@ static ssize_t overclock_vdd_store(struct kobject *k,
 	if(!mpu_dev || !mpu_freq_table)
 		return -EINVAL;
 
-	if ( attr == &overclock_vdd_opp1_attr) {
+	if ( attr == &overclock_vdd_opp0_attr) {
 		target_opp_nr = 0;
 		vdd_lower_limit = 900000;
 		vdd_upper_limit = 1200000;
 	}
-	if ( attr == &overclock_vdd_opp2_attr) {
+	if ( attr == &overclock_vdd_opp1_attr) {
 		target_opp_nr = 1;
+		vdd_lower_limit = 900000;
+		vdd_upper_limit = 1200000;
+	}
+	if ( attr == &overclock_vdd_opp2_attr) {
+		target_opp_nr = 2;
 		vdd_lower_limit = 950000;
 		vdd_upper_limit = 1300000;
 	}
 	if ( attr == &overclock_vdd_opp3_attr) {
-		target_opp_nr = 2;
+		target_opp_nr = 3;
 		vdd_lower_limit = 1000000;
 		vdd_upper_limit = 1400000;
 	}
 	if ( attr == &overclock_vdd_opp4_attr) {
-		target_opp_nr = 3;
+		target_opp_nr = 4;
 		vdd_lower_limit = 1100000;
 		vdd_upper_limit = 1500000;
 	}
 #ifdef CONFIG_P970_OPP5_ENABLED
 	if ( attr == &overclock_vdd_opp5_attr) {
-		target_opp_nr = 4;
+		target_opp_nr = 5;
 		vdd_lower_limit = 1200000;
 		vdd_upper_limit = 1600000;
 	}
@@ -733,6 +742,11 @@ static int __init omap2_common_pm_init(void)
 
 		/* Overclock vdd sysfs interface */
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+		error = sysfs_create_file(power_kobj, &overclock_vdd_opp0_attr.attr);
+		if (error) {
+			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+			return error;
+		}
 		error = sysfs_create_file(power_kobj, &overclock_vdd_opp1_attr.attr);
 		if (error) {
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);

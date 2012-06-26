@@ -67,6 +67,8 @@ static ssize_t overclock_show(struct kobject *, struct kobj_attribute *,
 static ssize_t overclock_store(struct kobject *k, struct kobj_attribute *,
 			  const char *buf, size_t n);
 
+static struct kobj_attribute overclock_opp0_attr =
+	__ATTR(overclock_opp0, 0644, overclock_show, overclock_store);
 static struct kobj_attribute overclock_opp1_attr =
 	__ATTR(overclock_opp1, 0644, overclock_show, overclock_store);
 static struct kobj_attribute overclock_opp2_attr =
@@ -264,6 +266,11 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 #endif
 
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+	error = sysfs_create_file(power_kobj, &overclock_opp0_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
 	error = sysfs_create_file(power_kobj, &overclock_opp1_attr.attr);
 	if (error) {
 		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
@@ -340,17 +347,19 @@ static ssize_t overclock_show(struct kobject *kobj,
 	mpu_dev = omap2_get_mpuss_device();
 	if (IS_ERR(mpu_dev))
 		return -EINVAL;
-	if ( attr == &overclock_opp1_attr)
+	if ( attr == &overclock_opp0_attr)
 		target_opp_nr = 0;
-	if ( attr == &overclock_opp2_attr)
+	if ( attr == &overclock_opp1_attr)
 		target_opp_nr = 1;
-	if ( attr == &overclock_opp3_attr)
+	if ( attr == &overclock_opp2_attr)
 		target_opp_nr = 2;
-	if ( attr == &overclock_opp4_attr)
+	if ( attr == &overclock_opp3_attr)
 		target_opp_nr = 3;
+	if ( attr == &overclock_opp4_attr)
+		target_opp_nr = 4;
 #ifdef CONFIG_P970_OPP5_ENABLED
 	if ( attr == &overclock_opp5_attr)
-		target_opp_nr = 4;
+		target_opp_nr = 5;
 #endif
 	
 	//Find opp (1 MHZ steps)
@@ -388,33 +397,39 @@ static ssize_t overclock_store(struct kobject *k,
 		return -EINVAL;
 
 	// Hard coded clock limits
-	if (attr == &overclock_opp1_attr) {
+	if (attr == &overclock_opp0_attr) {
 		target_opp_nr = 0;
-		//volt_nominal = 1000000;
+		//volt_nominal = 900000;
 		opp_lower_limit = 100;
-		opp_upper_limit = 500;
+		opp_upper_limit = 200;
+	}
+	if (attr == &overclock_opp1_attr) {
+		target_opp_nr = 1;
+		//volt_nominal = 1000000;
+		opp_lower_limit = 201;
+		opp_upper_limit = 450;
 	}
 	if (attr == &overclock_opp2_attr) {
-		target_opp_nr = 1;
+		target_opp_nr = 2;
 		//volt_nominal = 1162500;
-		opp_lower_limit = 501;
+		opp_lower_limit = 451;
 		opp_upper_limit = 700;
 	}
 	if (attr == &overclock_opp3_attr) {
-		target_opp_nr = 2;
+		target_opp_nr = 3;
 		//volt_nominal = 1300000;
 		opp_lower_limit = 701;
 		opp_upper_limit = 900;
 	}
 	if (attr == &overclock_opp4_attr) {
-		target_opp_nr = 3;
+		target_opp_nr = 4;
 		//volt_nominal = 1350000;
 		opp_lower_limit = 901;
 		opp_upper_limit = 1100;
 	}
 #ifdef CONFIG_P970_OPP5_ENABLED
 	if ( attr == &overclock_opp5_attr) {
-		target_opp_nr = 4;
+		target_opp_nr = 5;
 		opp_lower_limit = 1101;
 		opp_upper_limit = 1500;
 	}
@@ -455,11 +470,11 @@ static ssize_t overclock_store(struct kobject *k,
 				mpu_policy->cpuinfo.min_freq = freq/1000;
 			} 
 #ifdef CONFIG_P970_OPP5_ENABLED
-			if(target_opp_nr == 4) {
+			if(target_opp_nr == 5) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #else
-			if(target_opp_nr == 3) {
+			if(target_opp_nr == 4) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #endif
