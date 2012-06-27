@@ -159,7 +159,7 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 #endif
 
 			// Log eFUSE values to debug ...
-			pr_debug("%s: dom %s[%d]: using eFUSE ntarget 0x%08X\n",
+			pr_info("%s: dom %s[%d]: using eFUSE ntarget 0x%08X\n",
 				__func__,
 				dev_data->vdd_name, i,
 				dev_data->volt_data[i].sr_nvalue);
@@ -194,7 +194,7 @@ static void __init sr_set_testing_nvalues(struct omap_sr_dev_data *dev_data,
 	sr_data->senp_mod = dev_data->test_senpenable;
 	for (i = 0; i < dev_data->volts_supported; i++) {
 		dev_data->volt_data[i].sr_nvalue = dev_data->test_nvalues[i];
-		pr_debug("%s: dom %s[%d]: using TEST ntarget 0x%08X\n",
+		pr_info("%s: dom %s[%d]: using TEST ntarget 0x%08X\n",
 				__func__,
 				dev_data->vdd_name, i,
 				dev_data->test_nvalues[i]);
