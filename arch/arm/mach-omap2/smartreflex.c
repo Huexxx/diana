@@ -524,7 +524,8 @@ int sr_configure_errgen(struct voltagedomain *voltdm)
 
 	pdata = sr->pdev->dev.platform_data;
 
-	sr_set_clk_length(sr);
+	if (!sr->clk_length)
+		sr_set_clk_length(sr);
 
 	if (pdata) {
 		senp_en = pdata->senp_mod;
@@ -595,7 +596,8 @@ int sr_configure_minmax(struct voltagedomain *voltdm)
 
 	pdata = sr->pdev->dev.platform_data;
 
-	sr_set_clk_length(sr);
+	if (!sr->clk_length)
+		sr_set_clk_length(sr);
 
 	if (pdata) {
 		senp_en = pdata->senp_mod;

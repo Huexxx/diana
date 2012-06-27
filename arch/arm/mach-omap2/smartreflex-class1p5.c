@@ -6,11 +6,11 @@
  *
  * Smart reflex class 1.5 is also called periodic SW Calibration
  * Some of the highlights are as follows:
- * ? Host CPU triggers OPP calibration when transitioning to non calibrated
+ * – Host CPU triggers OPP calibration when transitioning to non calibrated
  *   OPP
- * ? SR-AVS + VP modules are used to perform calibration
- * ? Once completed, the SmartReflex-AVS module can be disabled
- * ? Enables savings based on process, supply DC accuracy and aging
+ * – SR-AVS + VP modules are used to perform calibration
+ * – Once completed, the SmartReflex-AVS module can be disabled
+ * – Enables savings based on process, supply DC accuracy and aging
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -36,6 +36,8 @@
 #define SR1P5_SAMPLING_DELAY_MS	1
 #define SR1P5_STABLE_SAMPLES	5
 #define SR1P5_MAX_TRIGGERS	5
+
+#define SR_DEBUG 1
 
 /*
  * we expect events in 10uS, if we dont get 2wice times as much,
@@ -112,7 +114,7 @@ static int sr_class1p5_notify(struct voltagedomain *voltdm, u32 status)
 
 	work_data = get_sr1p5_work(voltdm);
 	if (unlikely(!work_data)) {
-		pr_err("%s:%s no work data!!\n", __func__, voltdm->name);
+		pr_err("%s: %s no work data!!\n", __func__, voltdm->name);
 		return -EINVAL;
 	}
 
@@ -173,9 +175,12 @@ static void do_calibrate(struct work_struct *work)
 	 * 1.5 disable was called.
 	 */
 	if (omap_vscale_pause(work_data->voltdm, true)) {
-		schedule_delayed_work(&work_data->work,
-				      msecs_to_jiffies(SR1P5_SAMPLING_DELAY_MS *
-						       SR1P5_STABLE_SAMPLES));
+#if SR_DEBUG
+		pr_info("%s: do_calibrate handle race condition  %d\n",
+			__func__, work_data->vdata->volt_nominal);
+#endif
+		schedule_delayed_work(&work_data->work,msecs_to_jiffies(
+			SR1P5_SAMPLING_DELAY_MS*SR1P5_STABLE_SAMPLES));
 		return;
 	}
 
@@ -185,16 +190,24 @@ static void do_calibrate(struct work_struct *work)
 	 * flag and return.
 	 */
 	if (unlikely(!work_data->work_active)) {
-		pr_err("%s:%s unplanned work invocation!\n", __func__,
-		       voltdm->name);
+		pr_err("%s: %s unplanned work invocation!\n",
+			__func__, voltdm->name);
 		omap_vscale_unpause(work_data->voltdm);
 		return;
 	}
 
+	/* Some debug info to know if do_calibrate is running */
 	work_data->num_calib_triggers++;
+
 	/* if we are triggered first time, we need to start isr to sample */
 	if (work_data->num_calib_triggers == 1)
+		{
+#if SR_DEBUG
+		pr_info("%s: start sampling  %d \n",
+			__func__, work_data->vdata->volt_nominal);
+#endif
 		goto start_sampling;
+		}
 
 	/* Stop isr from interrupting our measurements :) */
 	sr_notifier_control(voltdm, false);
@@ -204,6 +217,10 @@ static void do_calibrate(struct work_struct *work)
 	/* if there are no samples captured.. SR is silent, aka stability! */
 	if (!work_data->num_osc_samples) {
 		u_volt_safe = omap_vp_get_curr_volt(voltdm);
+#if SR_DEBUG
+		pr_info("%s: done_calib %d, volt curr %ld, volt safe %ld \n", __func__,
+			work_data->vdata->volt_nominal, u_volt_current, u_volt_safe);
+#endif		
 		u_volt_current = u_volt_safe;
 		goto done_calib;
 	}
@@ -220,12 +237,21 @@ start_sampling:
 	sr_notifier_control(voltdm, false);
 	/* Clear all transdones */
 	while (omap_vp_is_transdone(voltdm))
+		{
+#if SR_DEBUG		
+		pr_info("%s: Clear all transdone %d \n", __func__,
+			work_data->vdata->volt_nominal);
+#endif		
 		omap_vp_clear_transdone(voltdm);
+		}
 	/* trigger sampling */
 	sr_notifier_control(voltdm, true);
-	schedule_delayed_work(&work_data->work,
-			      msecs_to_jiffies(SR1P5_SAMPLING_DELAY_MS *
-					       SR1P5_STABLE_SAMPLES));
+#if SR_DEBUG
+	pr_info("%s: schedule after isr trigger, volt %d \n", __func__,
+		work_data->vdata->volt_nominal);
+#endif	
+	schedule_delayed_work(&work_data->work,msecs_to_jiffies(
+		SR1P5_SAMPLING_DELAY_MS*SR1P5_STABLE_SAMPLES));
 	omap_vscale_unpause(work_data->voltdm);
 
 	return;
@@ -251,8 +277,10 @@ done_calib:
 	 */
 
 	if (cpu_is_omap3630()) {
-		pr_debug("%s:%s - sr opp margin %d\n", __func__, voltdm->name, volt_data->sr_oppmargin);
-
+#if SR_DEBUG	
+		pr_info("%s: %s - volt nominal %d, sr opp margin %d \n",
+			__func__, voltdm->name, volt_data->volt_nominal, volt_data->sr_oppmargin);
+#endif
 		volt_data->volt_calibrated += volt_data->sr_oppmargin;
 		if (volt_data->volt_calibrated > volt_data->volt_nominal) {
 			volt_data->volt_calibrated = volt_data->volt_nominal;
@@ -260,9 +288,15 @@ done_calib:
 	}
 
 	if (volt_data->volt_calibrated != u_volt_current) {
-		pr_debug("%s:%s reconfiguring to voltage %d\n",
-			 __func__, voltdm->name, volt_data->volt_calibrated);
+#if SR_DEBUG
+		pr_info("%s: %s reconfiguring to voltage %d\n",
+			__func__, voltdm->name, volt_data->volt_calibrated);	
+#endif
 		omap_voltage_scale_vdd(voltdm, volt_data);
+#if SR_DEBUG
+		pr_info("%s: Setting calib volt %d for %s done \n ", __func__,
+			volt_data->volt_calibrated, voltdm->name);
+#endif		
 	}
 
 	/*
@@ -276,8 +310,10 @@ done_calib:
 	omap_vscale_unpause(work_data->voltdm);
 
 	/* Release c-state constraint */
-	omap_pm_set_max_mpu_wakeup_lat(&work_data->qos_request, -1);
-	pr_debug("%s - %s: release c-state\n", __func__, voltdm->name);
+    	omap_pm_set_max_mpu_wakeup_lat(&work_data->qos_request, -1);
+#if SR_DEBUG
+    	pr_info("%s - %s: release c-state\n", __func__, voltdm->name);
+#endif
 }
 
 #if CONFIG_OMAP_SR_CLASS1P5_RECALIBRATION_DELAY
@@ -365,13 +401,18 @@ static int sr_class1p5_enable(struct voltagedomain *voltdm,
 	work_data->num_calib_triggers = 0;
 
 	/* Hold a c-state constraint */
-	omap_pm_set_max_mpu_wakeup_lat(&work_data->qos_request, 1000);
-	pr_debug("%s - %s: hold c-state\n", __func__, voltdm->name);
+    	omap_pm_set_max_mpu_wakeup_lat(&work_data->qos_request, 1000);
+#if SR_DEBUG
+    	pr_info("%s - %s: hold c-state\n", __func__, voltdm->name);
+#endif
 
+//#ifdef SR_WORKQUEUE_METHOD
 	/* program the workqueue and leave it to calibrate offline.. */
-	schedule_delayed_work(&work_data->work,
-			      msecs_to_jiffies(SR1P5_SAMPLING_DELAY_MS *
-					       SR1P5_STABLE_SAMPLES));
+	schedule_delayed_work(&work_data->work,msecs_to_jiffies(
+		SR1P5_SAMPLING_DELAY_MS*SR1P5_STABLE_SAMPLES));
+/*#else
+	sr_recalibrate(work_data); // Boot time calibration ...
+#endif*/
 
 	return 0;
 }
@@ -409,9 +450,11 @@ static int sr_class1p5_disable(struct voltagedomain *voltdm,
 		omap_vp_disable(voltdm);
 		sr_disable(voltdm);
 
-		/* Release c-state constraint */
-		omap_pm_set_max_mpu_wakeup_lat(&work_data->qos_request, -1);
-		pr_debug("%s - %s: release c-state\n", __func__, voltdm->name);
+		 /* Release c-state constraint */
+        	omap_pm_set_max_mpu_wakeup_lat(&work_data->qos_request, -1);
+#if SR_DEBUG
+        	pr_info("%s - %s: release c-state\n", __func__, voltdm->name);
+#endif
 	}
 
 	/* if already calibrated, nothin special to do here.. */
@@ -524,7 +567,10 @@ static int sr_class1p5_start(struct voltagedomain *voltdm,
 		return -ENOMEM;
 	}
 	work_data->voltdm = voltdm;
+
+//#ifdef SR_WORKQUEUE_METHOD		
 	INIT_DELAYED_WORK_DEFERRABLE(&work_data->work, do_calibrate);
+//#endif	
 	return 0;
 }
 
@@ -607,7 +653,7 @@ int __init sr_class1p5_init(void)
 #if CONFIG_OMAP_SR_CLASS1P5_RECALIBRATION_DELAY
 		INIT_DELAYED_WORK_DEFERRABLE(&recal_work, do_recalibrate);
 		schedule_delayed_work(&recal_work, msecs_to_jiffies(
-				CONFIG_OMAP_SR_CLASS1P5_RECALIBRATION_DELAY));
+			CONFIG_OMAP_SR_CLASS1P5_RECALIBRATION_DELAY));
 #endif
 		pr_info("SmartReflex class 1.5 driver: initialized (%dms)\n",
 			CONFIG_OMAP_SR_CLASS1P5_RECALIBRATION_DELAY);
