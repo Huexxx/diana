@@ -82,20 +82,24 @@ static u32 omap34xx_opp_def_size = ARRAY_SIZE(omap34xx_opp_def_list);
 
 static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
 	/* MPU OPP0 - OPP-LOW */
-	OMAP_OPP_DEF("mpu", true,  100000000, 900000),
+	OMAP_OPP_DEF("mpu", true, 100000000, 900000),
 	/* MPU OPP1 - OPP50 */
-	OMAP_OPP_DEF("mpu", true,  300000000, 1000000),
+	OMAP_OPP_DEF("mpu", true, 300000000, 1000000),
 	/* MPU OPP2 - OPP100 */
-	OMAP_OPP_DEF("mpu", true,  600000000, 1162500),
+	OMAP_OPP_DEF("mpu", true, 600000000, 1162500),
 	/* MPU OPP3 - OPP-Turbo */
 	OMAP_OPP_DEF("mpu", true, 800000000, 1300000),
 	/* MPU OPP4 - OPP-SB */
 	OMAP_OPP_DEF("mpu", true, 1000000000, 1350000),
 	/* MPU OPP5 */
-#ifdef CONFIG_P970_OPP5_ENABLED
-	OMAP_OPP_DEF("mpu", true,  1200000000, 1400000),
+#ifdef CONFIG_P970_OPPS_ENABLED
+	OMAP_OPP_DEF("mpu", true, 1200000000, 1400000),
+	OMAP_OPP_DEF("mpu", true, 1300000000, 1450000),
+	OMAP_OPP_DEF("mpu", true, 1350000000, 1500000),
 #else
-	OMAP_OPP_DEF("mpu", false,  1200000000, 1400000),
+	OMAP_OPP_DEF("mpu", false, 1200000000, 1400000),
+	OMAP_OPP_DEF("mpu", false, 1300000000, 1450000),
+	OMAP_OPP_DEF("mpu", false, 1350000000, 1500000),
 #endif
 
 	/* L3 OPP1 - OPPLOW, OPP50 */
@@ -114,10 +118,14 @@ static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
 	/* DSP OPP4 - OPP-SB */
 	OMAP_OPP_DEF("iva", true, 800000000, 1350000),
 	/* DSP OPP5 */
-#ifdef CONFIG_P970_OPP5_ENABLED
-	OMAP_OPP_DEF("iva", true, 840000000, 1400000),
+#ifdef CONFIG_P970_OPPS_ENABLED
+	OMAP_OPP_DEF("iva", true, 940000000, 1400000),
+	OMAP_OPP_DEF("iva", true, 1010000000, 1450000),
+	OMAP_OPP_DEF("iva", true, 1045000000, 1500000),
 #else
-	OMAP_OPP_DEF("iva", false, 840000000, 1400000),
+	OMAP_OPP_DEF("iva", false, 940000000, 1400000),
+	OMAP_OPP_DEF("iva", false, 1010000000, 1450000),
+	OMAP_OPP_DEF("iva", false, 1045000000, 1500000),
 #endif
 };
 static u32 omap36xx_opp_def_size = ARRAY_SIZE(omap36xx_opp_def_list);
