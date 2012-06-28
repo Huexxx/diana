@@ -372,8 +372,10 @@ static struct omap_volt_data omap36xx_vdd1_volt_data[] = {
 	{.volt_nominal = 1162500, .sr_oppmargin = 37500, .sr_errminlimit = 0xF9, .vp_errgain = 0x16,.abb_type = NOMINAL_OPP},
 	{.volt_nominal = 1300000, .sr_oppmargin = 37500, .sr_errminlimit = 0xFA, .vp_errgain = 0x23,.abb_type = NOMINAL_OPP},
 	{.volt_nominal = 1350000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x27,.abb_type = FAST_OPP},
-#ifdef CONFIG_P970_OPP5_ENABLED
+#ifdef CONFIG_P970_OPPS_ENABLED
 	{.volt_nominal = 1400000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x27,.abb_type = FAST_OPP},
+	{.volt_nominal = 1450000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x27,.abb_type = FAST_OPP},
+	{.volt_nominal = 1500000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x27,.abb_type = FAST_OPP},
 #endif
 };
 

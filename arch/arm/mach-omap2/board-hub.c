@@ -281,17 +281,26 @@ static struct opp_frequencies opp_freq_add_table[] __initdata = {
   },
   {
 	.mpu = 1000000000,
-	.iva =  800000000,
+	.iva = 800000000,
 	.ena = OMAP3630_CONTROL_FUSE_OPP1G_VDD1,
   },
-#ifdef CONFIG_P970_OPP5_ENABLED
+#ifdef CONFIG_P970_OPPS_ENABLED
   {
 	.mpu = 1200000000,
-	.iva =  840000000,
-	.ena = OMAP3630_CONTROL_FUSE_OPP1_2G_VDD1,
+	.iva = 940000000,
+	.ena = OMAP3630_CONTROL_FUSE_OPP2G_VDD1,
+  },
+  {
+	.mpu = 1300000000,
+	.iva = 1010000000,
+	.ena = OMAP3630_CONTROL_FUSE_OPP3G_VDD1,
+  },
+  {
+	.mpu = 1350000000,
+	.iva = 1045000000,
+	.ena = OMAP3630_CONTROL_FUSE_OPP4G_VDD1,
   },
 #endif
-
   { 0, 0, 0 },
 };
 

@@ -77,8 +77,14 @@ static struct kobj_attribute overclock_opp3_attr =
 	__ATTR(overclock_opp3, 0644, overclock_show, overclock_store);
 static struct kobj_attribute overclock_opp4_attr =
 	__ATTR(overclock_opp4, 0644, overclock_show, overclock_store);
+#ifdef CONFIG_P970_OPPS_ENABLED
 static struct kobj_attribute overclock_opp5_attr =
 	__ATTR(overclock_opp5, 0644, overclock_show, overclock_store);
+static struct kobj_attribute overclock_opp6_attr =
+	__ATTR(overclock_opp6, 0644, overclock_show, overclock_store);
+static struct kobj_attribute overclock_opp7_attr =
+	__ATTR(overclock_opp7, 0644, overclock_show, overclock_store);
+#endif
 #endif
 
 /* TODO: Add support for SDRAM timing changes */
@@ -237,7 +243,7 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 	}
 
 	policy->min = policy->cpuinfo.min_freq;
-#ifdef CONFIG_P970_OPP5_ENABLED
+#ifdef CONFIG_P970_OPPS_ENABLED
 	policy->max = 1000000;
 #else
 	policy->max = policy->cpuinfo.max_freq;
@@ -292,8 +298,18 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 		return error;
 	}
-#ifdef CONFIG_P970_OPP5_ENABLED
+#ifdef CONFIG_P970_OPPS_ENABLED
 	error = sysfs_create_file(power_kobj, &overclock_opp5_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &overclock_opp6_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &overclock_opp7_attr.attr);
 	if (error) {
 		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 		return error;
@@ -358,9 +374,13 @@ static ssize_t overclock_show(struct kobject *kobj,
 		target_opp_nr = 3;
 	if ( attr == &overclock_opp4_attr)
 		target_opp_nr = 4;
-#ifdef CONFIG_P970_OPP5_ENABLED
+#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_opp5_attr)
 		target_opp_nr = 5;
+	if ( attr == &overclock_opp6_attr)
+		target_opp_nr = 6;
+	if ( attr == &overclock_opp7_attr)
+		target_opp_nr = 7;
 #endif
 	
 	//Find opp (1 MHZ steps)
@@ -428,11 +448,24 @@ static ssize_t overclock_store(struct kobject *k,
 		opp_lower_limit = 901;
 		opp_upper_limit = 1100;
 	}
-#ifdef CONFIG_P970_OPP5_ENABLED
+#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_opp5_attr) {
 		target_opp_nr = 5;
+		//volt_nominal = 1400000;
 		opp_lower_limit = 1101;
-		opp_upper_limit = 1500;
+		opp_upper_limit = 1250;
+	}
+	if ( attr == &overclock_opp6_attr) {
+		target_opp_nr = 6;
+		//volt_nominal = 1450000;
+		opp_lower_limit = 1251;
+		opp_upper_limit = 1300;
+	}
+	if ( attr == &overclock_opp7_attr) {
+		target_opp_nr = 7;
+		//volt_nominal = 1500000;
+		opp_lower_limit = 1301;
+		opp_upper_limit = 1400;
 	}
 #endif
 
@@ -469,9 +502,9 @@ static ssize_t overclock_store(struct kobject *k,
 			}
 			if(target_opp_nr == 0) {
 				mpu_policy->cpuinfo.min_freq = freq/1000;
-			} 
-#ifdef CONFIG_P970_OPP5_ENABLED
-			if(target_opp_nr == 5) {
+			}
+#ifdef CONFIG_P970_OPPS_ENABLED
+			if(target_opp_nr == 7) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #else
@@ -479,7 +512,6 @@ static ssize_t overclock_store(struct kobject *k,
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #endif
-
 			opp_enable(temp_opp);
 			cpufreq_update_policy(0);
 

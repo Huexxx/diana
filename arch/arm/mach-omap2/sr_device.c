@@ -59,7 +59,6 @@ static struct omap_device_pm_latency omap_sr_latency[] = {
 	},
 };
 
-#ifdef CONFIG_P970_OPP5_ENABLED
 static void cal_reciprocal(u32 sensor, u32 *sengain, u32 *rnsen)
 {
 	u32 gn, rn, mul;
@@ -74,7 +73,7 @@ static void cal_reciprocal(u32 sensor, u32 *sengain, u32 *rnsen)
 	}
 }
 
-static u32 cal_opp5_nvalue(u32 sennval, u32 senpval)
+static u32 cal_opp_nvalue(u32 sennval, u32 senpval)
 {
 	u32 senpgain, senngain;
 	u32 rnsenp, rnsenn;
@@ -88,7 +87,6 @@ static u32 cal_opp5_nvalue(u32 sennval, u32 senpval)
 		(rnsenp << NVALUERECIPROCAL_RNSENP_SHIFT) |
 		(rnsenn << NVALUERECIPROCAL_RNSENN_SHIFT);
 }
-#endif
 
 /* Read EFUSE values from control registers for OMAP3430 */
 static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
@@ -144,19 +142,22 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 				__raw_readb(ctrl_base + offset + 1) << 8 |
 				__raw_readb(ctrl_base + offset + 2) << 16;
 		} else {
-#ifdef CONFIG_P970_OPP5_ENABLED
-			if (i == 5) {
-				// The hub board does not have an eFuse for OPP5.
-				// We have to calculate a rough approximation of the nValue for this OPP.
-				dev_data->volt_data[i].sr_nvalue = cal_opp5_nvalue(2025, 1750);
+			/* The hub board does not have an eFuse for OPP5.
+			 * We have to calculate a rough approximation of the nValue for this OPP. */
+			if (i == 0) {				
+				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(593, 513);
+#ifdef CONFIG_P970_OPPS_ENABLED
+			} else if (i == 5) {
+				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(1941, 1856);
+			} else if (i == 6) {
+				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(2025, 1975);
+			} else if (i == 7) {
+				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(2067, 2034);
+#endif
 			} else {
 				dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
 					dev_data->efuse_nvalues_offs[i]);
 			}
-#else
-			dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
-				dev_data->efuse_nvalues_offs[i]);
-#endif
 
 			// Log eFUSE values to debug ...
 			pr_info("%s: dom %s[%d]: using eFUSE ntarget 0x%08X\n",
