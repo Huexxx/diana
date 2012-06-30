@@ -29,6 +29,10 @@
 #include <plat/smartreflex.h>
 #include <plat/voltage.h>
 
+static u32 fac_sennval[] = { 0, 0, 0, 0 };
+
+static u32 fac_senpval[] = { 0, 0, 0, 0 };
+
 static int sr_idle_hwmod(struct omap_device *od)
 {
 	struct omap_hwmod *oh = *od->hwmods;
@@ -92,7 +96,10 @@ static u32 cal_opp_nvalue(u32 sennval, u32 senpval)
 static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 				struct omap_sr_data *sr_data)
 {
+	bool is_mpu;
 	int i;
+	u32 uppernslope, upperpslope;
+	u32 lowernslope, lowerpslope;
 	void __iomem *ctrl_base;
 
 	if (!dev_data) {
@@ -133,6 +140,8 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 	if (cpu_is_omap44xx())
 		ctrl_base =  ioremap(0x4A002000, SZ_1K);
 
+	is_mpu = (strcmp(dev_data->vdd_name,"mpu") == 0);
+
 	for (i = 0; i < dev_data->volts_supported; i++) {
 		if (cpu_is_omap44xx()) {
 			u16 offset = dev_data->efuse_nvalues_offs[i];
@@ -142,30 +151,59 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 				__raw_readb(ctrl_base + offset + 1) << 8 |
 				__raw_readb(ctrl_base + offset + 2) << 16;
 		} else {
-			/* The hub board does not have an eFuse for OPP5.
-			 * We have to calculate a rough approximation of the nValue for this OPP. */
-			if (i == 0) {				
-				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(593, 513);
-#ifdef CONFIG_P970_OPPS_ENABLED
-			} else if (i == 5) {
-				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(1941, 1856);
-			} else if (i == 6) {
-				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(2025, 1975);
-			} else if (i == 7) {
-				dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(2067, 2034);
-#endif
-			} else {
-				dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
-					dev_data->efuse_nvalues_offs[i]);
+			dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
+				dev_data->efuse_nvalues_offs[i]);
+			if ((i > 0) && (i < 5) && (is_mpu)) {
+				u32 fac_senpgain, fac_senngain;
+				u32 fac_rnsenp, fac_rnsenn;
+				/* Obtaining all the needed factory values */
+				fac_senpgain = (dev_data->volt_data[i].sr_nvalue & 0x00f00000) >> 0x14;
+				fac_senngain = (dev_data->volt_data[i].sr_nvalue & 0x000f0000) >> 0x10;
+				fac_rnsenp = (dev_data->volt_data[i].sr_nvalue & 0x0000ff00) >> 0x8;
+				fac_rnsenn = (dev_data->volt_data[i].sr_nvalue & 0x000000ff);
+				fac_senpval[i-1] = ((1 << (fac_senpgain + 8))/fac_rnsenp);
+				fac_sennval[i-1] = ((1 << (fac_senngain + 8))/fac_rnsenn);
 			}
-
-			// Log eFUSE values to debug ...
-			pr_info("%s: dom %s[%d]: using eFUSE ntarget 0x%08X\n",
-				__func__,
-				dev_data->vdd_name, i,
-				dev_data->volt_data[i].sr_nvalue);
 		}
 	}
+
+	if (is_mpu) {
+		/* Calculating the estimated upper slope (x1000) */
+		uppernslope = (((2 * fac_sennval[3]) + fac_sennval[1] - (3 * fac_sennval[2])) * 5);
+		upperpslope = (((2 * fac_senpval[3]) + fac_senpval[1] - (3 * fac_senpval[2])) * 5);
+
+		/* Calculating the estimated lower slope (x1000) */
+		lowernslope = ((fac_sennval[1] - fac_sennval[0]) * 3);
+		lowerpslope = ((fac_senpval[1] - fac_senpval[0]) * 3);
+	}
+
+	for (i = 0; i < dev_data->volts_supported; i++) {
+		/* Overwrite nvalues with calculated ones */
+		if ((i == 0)  && (is_mpu)) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[0] - (lowernslope * 2 / 9),
+				fac_senpval[0] - (lowerpslope * 2 / 9));
+#ifdef CONFIG_P970_OPPS_ENABLED
+		} else if (i == 5) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[3] + (uppernslope / 5),
+				fac_senpval[3] + (upperpslope / 5));
+		} else if (i == 6) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[3] + (uppernslope * 3 / 10),
+				fac_senpval[3] + (upperpslope * 3 / 10));
+		} else if (i == 7) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[3] + (uppernslope * 35 / 100),
+				fac_senpval[3] + (upperpslope * 35 / 100));
+#endif
+		}
+		/* Log eFUSE values to debug ... */
+		pr_info("%s: dom %s[%d]: using eFUSE ntarget 0x%08X\n",
+			__func__, dev_data->vdd_name, i,
+			dev_data->volt_data[i].sr_nvalue);
+	}
+
 	if (cpu_is_omap44xx())
 		iounmap(ctrl_base);
 }
