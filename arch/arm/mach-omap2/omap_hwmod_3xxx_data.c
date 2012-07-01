@@ -2749,6 +2749,7 @@ static struct omap_hwmod omap34xx_sr1_hwmod = {
 };
 
 static u32 omap36xx_sr1_efuse_offs[] = {
+	OMAP3630_CONTROL_FUSE_OPPULOW_VDD1,
 	OMAP3630_CONTROL_FUSE_OPPLOW_VDD1,
 	OMAP3630_CONTROL_FUSE_OPP50_VDD1,
 	OMAP3630_CONTROL_FUSE_OPP100_VDD1,
@@ -2758,15 +2759,16 @@ static u32 omap36xx_sr1_efuse_offs[] = {
 	OMAP3630_CONTROL_FUSE_OPP2G_VDD1,
 	OMAP3630_CONTROL_FUSE_OPP3G_VDD1,
 	OMAP3630_CONTROL_FUSE_OPP4G_VDD1,
+	OMAP3630_CONTROL_FUSE_OPP5G_VDD1,
 #endif
 };
 
 static u32 omap36xx_sr1_test_nvalues[] = {
 	
 #ifdef CONFIG_P970_OPPS_ENABLED
-	0x898beb, 0x898beb, 0x999b83, 0xaac5a8, 0xaab197, 0xaab197, 0xaab197, 0xaab197,
+	0x898beb, 0x898beb, 0x898beb, 0x999b83, 0xaac5a8, 0xaab197, 0xaaa294, 0xaa8d87, 0xaa8481, 0xab80fd,
 #else
-	0x898beb, 0x898beb, 0x999b83, 0xaac5a8, 0xaab197,
+	0x898beb, 0x898beb, 0x898beb, 0x999b83, 0xaac5a8, 0xaab197,
 #endif
 };
 

@@ -178,10 +178,12 @@
 #define MBX_PM_OPP2 2
 #define MBX_PM_OPP3 3
 #define MBX_PM_OPP4 4
-#ifdef CONFIG_P970_OPPS_ENABLED
 #define MBX_PM_OPP5 5
+#ifdef CONFIG_P970_OPPS_ENABLED
 #define MBX_PM_OPP6 6
 #define MBX_PM_OPP7 7
+#define MBX_PM_OPP8 8
+#define MBX_PM_OPP9 9
 #endif
 #define MBX_OLDOPP_EXTRACT(OPPMSG) ((0x00F0 & (OPPMSG)) >> 4)
 #define MBX_NEWOPP_EXTRACT(OPPMSG) (0x000F & (OPPMSG))
