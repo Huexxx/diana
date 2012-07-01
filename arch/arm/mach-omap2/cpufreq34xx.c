@@ -81,25 +81,29 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 static u32 omap34xx_opp_def_size = ARRAY_SIZE(omap34xx_opp_def_list);
 
 static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
-	/* MPU OPP0 - OPP-LOW */
+	/* MPU OPP0 - OPP-ULOW */
 	OMAP_OPP_DEF("mpu", true, 100000000, 900000),
-	/* MPU OPP1 - OPP50 */
+	/* MPU OPP1 - OPP-LOW */
+	OMAP_OPP_DEF("mpu", true, 200000000, 950000),
+	/* MPU OPP2 - OPP50 */
 	OMAP_OPP_DEF("mpu", true, 300000000, 1000000),
-	/* MPU OPP2 - OPP100 */
+	/* MPU OPP3 - OPP100 */
 	OMAP_OPP_DEF("mpu", true, 600000000, 1162500),
-	/* MPU OPP3 - OPP-Turbo */
+	/* MPU OPP4 - OPP-Turbo */
 	OMAP_OPP_DEF("mpu", true, 800000000, 1300000),
-	/* MPU OPP4 - OPP-SB */
+	/* MPU OPP5 - OPP-SB */
 	OMAP_OPP_DEF("mpu", true, 1000000000, 1350000),
-	/* MPU OPP5 */
+	/* MPU OPPS */
 #ifdef CONFIG_P970_OPPS_ENABLED
-	OMAP_OPP_DEF("mpu", true, 1200000000, 1400000),
-	OMAP_OPP_DEF("mpu", true, 1300000000, 1450000),
-	OMAP_OPP_DEF("mpu", true, 1350000000, 1500000),
+	OMAP_OPP_DEF("mpu", true, 1100000000, 1400000),
+	OMAP_OPP_DEF("mpu", true, 1200000000, 1450000),
+	OMAP_OPP_DEF("mpu", true, 1300000000, 1500000),
+	OMAP_OPP_DEF("mpu", true, 1350000000, 1550000),
 #else
-	OMAP_OPP_DEF("mpu", false, 1200000000, 1400000),
-	OMAP_OPP_DEF("mpu", false, 1300000000, 1450000),
-	OMAP_OPP_DEF("mpu", false, 1350000000, 1500000),
+	OMAP_OPP_DEF("mpu", false, 1100000000, 1400000),
+	OMAP_OPP_DEF("mpu", false, 1200000000, 1450000),
+	OMAP_OPP_DEF("mpu", false, 1300000000, 1500000),
+	OMAP_OPP_DEF("mpu", false, 1350000000, 1550000),
 #endif
 
 	/* L3 OPP1 - OPPLOW, OPP50 */
@@ -107,25 +111,29 @@ static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
 	/* L3 OPP2 - OPP100, OPP-Turbo, OPP-SB */
 	OMAP_OPP_DEF("l3_main", true, 200000000, 1162500),
 
-	/* DSP OPP0 - OPP-LOW */
-	OMAP_OPP_DEF("iva", true,  170000000, 900000),
-	/* DSP OPP1 - OPP50 */
-	OMAP_OPP_DEF("iva", true,  260000000, 1000000),
-	/* DSP OPP2 - OPP100 */
-	OMAP_OPP_DEF("iva", true,  520000000, 1162500),
-	/* DSP OPP3 - OPP-Turbo */
+	/* DSP OPP0 - OPP-ULOW */
+	OMAP_OPP_DEF("iva", true, 90000000, 900000),
+	/* DSP OPP1 - OPP-LOW */
+	OMAP_OPP_DEF("iva", true, 170000000, 950000),
+	/* DSP OPP2 - OPP50 */
+	OMAP_OPP_DEF("iva", true, 260000000, 1000000),
+	/* DSP OPP3 - OPP100 */
+	OMAP_OPP_DEF("iva", true, 520000000, 1162500),
+	/* DSP OPP4 - OPP-Turbo */
 	OMAP_OPP_DEF("iva", true, 660000000, 1300000),
-	/* DSP OPP4 - OPP-SB */
+	/* DSP OPP5 - OPP-SB */
 	OMAP_OPP_DEF("iva", true, 800000000, 1350000),
-	/* DSP OPP5 */
+	/* DSP OPPS */
 #ifdef CONFIG_P970_OPPS_ENABLED
-	OMAP_OPP_DEF("iva", true, 940000000, 1400000),
-	OMAP_OPP_DEF("iva", true, 1010000000, 1450000),
-	OMAP_OPP_DEF("iva", true, 1045000000, 1500000),
+	OMAP_OPP_DEF("iva", true, 870000000, 1400000),
+	OMAP_OPP_DEF("iva", true, 940000000, 1450000),
+	OMAP_OPP_DEF("iva", true, 1010000000, 1500000),
+	OMAP_OPP_DEF("iva", true, 1045000000, 1550000),
 #else
-	OMAP_OPP_DEF("iva", false, 940000000, 1400000),
-	OMAP_OPP_DEF("iva", false, 1010000000, 1450000),
-	OMAP_OPP_DEF("iva", false, 1045000000, 1500000),
+	OMAP_OPP_DEF("iva", false, 870000000, 1400000),
+	OMAP_OPP_DEF("iva", false, 940000000, 1450000),
+	OMAP_OPP_DEF("iva", false, 1010000000, 1500000),
+	OMAP_OPP_DEF("iva", false, 1045000000, 1550000),
 #endif
 };
 static u32 omap36xx_opp_def_size = ARRAY_SIZE(omap36xx_opp_def_list);

@@ -228,13 +228,17 @@ static struct kobj_attribute overclock_vdd_opp3_attr =
     __ATTR(overclock_vdd_opp3, 0644, overclock_vdd_show, overclock_vdd_store);
 static struct kobj_attribute overclock_vdd_opp4_attr =
     __ATTR(overclock_vdd_opp4, 0644, overclock_vdd_show, overclock_vdd_store);
-#ifdef CONFIG_P970_OPPS_ENABLED
 static struct kobj_attribute overclock_vdd_opp5_attr =
     __ATTR(overclock_vdd_opp5, 0644, overclock_vdd_show, overclock_vdd_store);
+#ifdef CONFIG_P970_OPPS_ENABLED
 static struct kobj_attribute overclock_vdd_opp6_attr =
     __ATTR(overclock_vdd_opp6, 0644, overclock_vdd_show, overclock_vdd_store);
 static struct kobj_attribute overclock_vdd_opp7_attr =
     __ATTR(overclock_vdd_opp7, 0644, overclock_vdd_show, overclock_vdd_store);
+static struct kobj_attribute overclock_vdd_opp8_attr =
+    __ATTR(overclock_vdd_opp8, 0644, overclock_vdd_show, overclock_vdd_store);
+static struct kobj_attribute overclock_vdd_opp9_attr =
+    __ATTR(overclock_vdd_opp9, 0644, overclock_vdd_show, overclock_vdd_store);
 #endif
 #endif
 
@@ -288,15 +292,21 @@ static ssize_t overclock_vdd_show(struct kobject *kobj,
 	if ( attr == &overclock_vdd_opp4_attr) {
 		target_opp = 4;
 	}
-#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_vdd_opp5_attr) {
 		target_opp = 5;
 	}
+#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_vdd_opp6_attr) {
 		target_opp = 6;
 	}
 	if ( attr == &overclock_vdd_opp7_attr) {
 		target_opp = 7;
+	}
+	if ( attr == &overclock_vdd_opp8_attr) {
+		target_opp = 8;
+	}
+	if ( attr == &overclock_vdd_opp9_attr) {
+		target_opp = 9;
 	}
 #endif
 
@@ -345,25 +355,25 @@ static ssize_t overclock_vdd_store(struct kobject *k,
 	}
 	if ( attr == &overclock_vdd_opp2_attr) {
 		target_opp_nr = 2;
-		vdd_lower_limit = 950000;
-		vdd_upper_limit = 1300000;
+		vdd_lower_limit = 900000;
+		vdd_upper_limit = 1200000;
 	}
 	if ( attr == &overclock_vdd_opp3_attr) {
 		target_opp_nr = 3;
-		vdd_lower_limit = 1000000;
-		vdd_upper_limit = 1400000;
+		vdd_lower_limit = 950000;
+		vdd_upper_limit = 1300000;
 	}
 	if ( attr == &overclock_vdd_opp4_attr) {
 		target_opp_nr = 4;
+		vdd_lower_limit = 1000000;
+		vdd_upper_limit = 1400000;
+	}
+	if ( attr == &overclock_vdd_opp5_attr) {
+		target_opp_nr = 5;
 		vdd_lower_limit = 1100000;
 		vdd_upper_limit = 1500000;
 	}
 #ifdef CONFIG_P970_OPPS_ENABLED
-	if ( attr == &overclock_vdd_opp5_attr) {
-		target_opp_nr = 5;
-		vdd_lower_limit = 1200000;
-		vdd_upper_limit = 1600000;
-	}
 	if ( attr == &overclock_vdd_opp6_attr) {
 		target_opp_nr = 6;
 		vdd_lower_limit = 1200000;
@@ -371,6 +381,16 @@ static ssize_t overclock_vdd_store(struct kobject *k,
 	}
 	if ( attr == &overclock_vdd_opp7_attr) {
 		target_opp_nr = 7;
+		vdd_lower_limit = 1200000;
+		vdd_upper_limit = 1600000;
+	}
+	if ( attr == &overclock_vdd_opp8_attr) {
+		target_opp_nr = 8;
+		vdd_lower_limit = 1200000;
+		vdd_upper_limit = 1600000;
+	}
+	if ( attr == &overclock_vdd_opp9_attr) {
+		target_opp_nr = 9;
 		vdd_lower_limit = 1200000;
 		vdd_upper_limit = 1600000;
 	}
@@ -787,18 +807,28 @@ static int __init omap2_common_pm_init(void)
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 			return error;
 		}
-#ifdef CONFIG_P970_OPPS_ENABLED
 		error = sysfs_create_file(power_kobj, &overclock_vdd_opp5_attr.attr);
 		if (error) {
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 			return error;
 		}
+#ifdef CONFIG_P970_OPPS_ENABLED
 		error = sysfs_create_file(power_kobj, &overclock_vdd_opp6_attr.attr);
 		if (error) {
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 			return error;
 		}
 		error = sysfs_create_file(power_kobj, &overclock_vdd_opp7_attr.attr);
+		if (error) {
+			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+			return error;
+		}
+		error = sysfs_create_file(power_kobj, &overclock_vdd_opp8_attr.attr);
+		if (error) {
+			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+			return error;
+		}
+		error = sysfs_create_file(power_kobj, &overclock_vdd_opp9_attr.attr);
 		if (error) {
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 			return error;
