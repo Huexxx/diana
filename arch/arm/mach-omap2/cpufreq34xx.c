@@ -133,7 +133,7 @@ static struct omap_opp_def __initdata omap36xx_opp_def_list[] = {
 	OMAP_OPP_DEF("iva", false, 870000000, 1450000),
 	OMAP_OPP_DEF("iva", false, 940000000, 1500000),
 	OMAP_OPP_DEF("iva", false, 1010000000, 1525000),
-	OMAP_OPP_DEF("iva", false, 1045000000, 1550000),
+	OMAP_OPP_DEF("iva", false, 1010000000, 1550000),
 #endif
 };
 static u32 omap36xx_opp_def_size = ARRAY_SIZE(omap36xx_opp_def_list);
