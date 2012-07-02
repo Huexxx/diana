@@ -367,17 +367,17 @@ static struct omap_volt_data omap34xx_vdd1_volt_data[] = {
 };
 
 static struct omap_volt_data omap36xx_vdd1_volt_data[] = {
-	{.volt_nominal = 900000, .sr_oppmargin = 25000, .sr_errminlimit = 0xF4, .vp_errgain = 0x0A,.abb_type = NOMINAL_OPP},
-	{.volt_nominal = 950000, .sr_oppmargin = 25000, .sr_errminlimit = 0xF4, .vp_errgain = 0x0B,.abb_type = NOMINAL_OPP}, 
-	{.volt_nominal = 1000000, .sr_oppmargin = 37500, .sr_errminlimit = 0xF4, .vp_errgain = 0x0C,.abb_type = NOMINAL_OPP}, 
-	{.volt_nominal = 1162500, .sr_oppmargin = 37500, .sr_errminlimit = 0xF9, .vp_errgain = 0x16,.abb_type = NOMINAL_OPP},
+	{.volt_nominal = 1000000, .sr_oppmargin = 12500, .sr_errminlimit = 0xF4, .vp_errgain = 0x0A,.abb_type = NOMINAL_OPP},
+	{.volt_nominal = 1025000, .sr_oppmargin = 25000, .sr_errminlimit = 0xF4, .vp_errgain = 0x0B,.abb_type = NOMINAL_OPP}, 
+	{.volt_nominal = 1050000, .sr_oppmargin = 37500, .sr_errminlimit = 0xF4, .vp_errgain = 0x0C,.abb_type = NOMINAL_OPP}, 
+	{.volt_nominal = 1175000, .sr_oppmargin = 37500, .sr_errminlimit = 0xF9, .vp_errgain = 0x16,.abb_type = NOMINAL_OPP},
 	{.volt_nominal = 1300000, .sr_oppmargin = 37500, .sr_errminlimit = 0xFA, .vp_errgain = 0x23,.abb_type = NOMINAL_OPP},
-	{.volt_nominal = 1350000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x27,.abb_type = FAST_OPP},
+	{.volt_nominal = 1400000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x27,.abb_type = FAST_OPP},
 #ifdef CONFIG_P970_OPPS_ENABLED
-	{.volt_nominal = 1400000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x28,.abb_type = FAST_OPP},
-	{.volt_nominal = 1450000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x29,.abb_type = FAST_OPP},
-	{.volt_nominal = 1500000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x2A,.abb_type = FAST_OPP},
-	{.volt_nominal = 1550000, .sr_oppmargin = 87500, .sr_errminlimit = 0xFA, .vp_errgain = 0x2B,.abb_type = FAST_OPP},
+	{.volt_nominal = 1450000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x28,.abb_type = FAST_OPP},
+	{.volt_nominal = 1500000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x29,.abb_type = FAST_OPP},
+	{.volt_nominal = 1525000, .sr_oppmargin = 62500, .sr_errminlimit = 0xFA, .vp_errgain = 0x2A,.abb_type = FAST_OPP},
+	{.volt_nominal = 1550000, .sr_oppmargin = 75000, .sr_errminlimit = 0xFA, .vp_errgain = 0x2B,.abb_type = FAST_OPP},
 #endif
 };
 
