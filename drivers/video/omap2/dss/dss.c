@@ -751,6 +751,16 @@ int dss_init(struct platform_device *pdev)
 	REG_FLD_MOD(DSS_CONTROL, 0, 2, 2);	/* venc clock mode = normal */
 #endif
 
+#ifdef CONFIG_OMAP2_DSS_DSI
+	/* disable the dsi interrupts so no spurious dsi irq's are deliverd
+	 * before the dsi block is fully initialzed -- this is especially an
+	 * issue if skip_init is true, as resetting the dss block would clear
+	 * these interupts anyway */
+	omap_writel(0, 0x4804FC1C); // DSI_IRQENABLE
+	omap_writel(0xFFFFFFFF, 0x4804FC4C); // COMPLEXIO_ERR
+	omap_writel(0x00FFFFFF, 0x4804FC18); // DSI_IRQSTATUS
+#endif
+
 	if (!cpu_is_omap44xx())
 		r = request_irq(INT_24XX_DSS_IRQ,
 				cpu_is_omap24xx()
