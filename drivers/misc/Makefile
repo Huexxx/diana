@@ -61,5 +61,3 @@ obj-$(CONFIG_MPU_SENSORS_MPU3050)   += mpu3050/
 # prime@sdcmicro.com Merge from 2.6.32 [START]
 obj-$(CONFIG_TSPDRV)		+= tspdrv/
 # prime@sdcmicro.com Merge from 2.6.32 [END]
-obj-m                           += symsearch/
-obj-y                           += overclock/
