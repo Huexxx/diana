@@ -255,8 +255,9 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 /* Program the actual transition time for worstcase.
  * TI measurements showed that the actual transition time never goes beyond 10ms on OMAP 3430, 3630 and OMAP 4.
  * 20ms buffer are added to avoid too frequent ondemand timer expiry.
+ * Huexxx: Raise value from original LG 15ms to 20ms.
  */
-	policy->cpuinfo.transition_latency = 30 * 1000;
+	policy->cpuinfo.transition_latency = 20 * 1000;
 
 /* LGE_CHANGE_E <sunggyun.yu@lge.com> 2010-12-01 For fast ondemand freq. change */
 #ifdef CONFIG_SMP
