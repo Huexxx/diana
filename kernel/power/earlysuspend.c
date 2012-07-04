@@ -23,10 +23,6 @@
 
 #include "power.h"
 
-#ifdef CONFIG_LGE_DVFS
-#include <linux/dvs_suite.h>
-#endif	// CONFIG_LGE_DVFS
-
 enum {
 	DEBUG_USER_STATE = 1U << 0,
 	DEBUG_SUSPEND = 1U << 2,
@@ -79,18 +75,6 @@ static void early_suspend(struct work_struct *work)
 	struct early_suspend *pos;
 	unsigned long irqflags;
 	int abort = 0;
-#ifdef CONFIG_LGE_DVFS
-	int ds_cpu = smp_processor_id();
-
-	if(ds_control.flag_run_dvs == 1)
-	{
-		if(ds_cpu == 0){
-			per_cpu(ds_sys_status, 0).flag_post_early_suspend = 1;
-			per_cpu(ds_sys_status, 0).do_post_early_suspend_sec = 
-				per_cpu(ds_counter, ds_cpu).elapsed_sec + DS_POST_EARLY_SUSPEND_DELAY_SEC;
-		}
-	}
-#endif	// CONFIG_LGE_DVFS
 
 	mutex_lock(&early_suspend_lock);
 	spin_lock_irqsave(&state_lock, irqflags);
@@ -132,9 +116,6 @@ static void late_resume(struct work_struct *work)
 	struct early_suspend *pos;
 	unsigned long irqflags;
 	int abort = 0;
-#ifdef CONFIG_LGE_DVFS
-	int ds_cpu = smp_processor_id();
-#endif	// CONFIG_LGE_DVFS
 
 	mutex_lock(&early_suspend_lock);
 	spin_lock_irqsave(&state_lock, irqflags);
@@ -158,16 +139,6 @@ static void late_resume(struct work_struct *work)
 		pr_info("late_resume: done\n");
 abort:
 	mutex_unlock(&early_suspend_lock);
-
-#ifdef CONFIG_LGE_DVFS
-	if(ds_control.flag_run_dvs == 1)
-	{
-		if(ds_cpu == 0){
-			per_cpu(ds_sys_status, 0).flag_post_early_suspend = 0;
-			per_cpu(ds_sys_status, 0).flag_do_post_early_suspend = 0;
-		}
-	}
-#endif	// CONFIG_LGE_DVFS
 }
 
 void request_suspend_state(suspend_state_t new_state)

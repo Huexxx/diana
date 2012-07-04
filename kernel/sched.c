@@ -79,14 +79,6 @@
 
 #include "sched_cpupri.h"
 
-#ifdef CONFIG_LGE_DVFS
-#include <asm/current.h>
-#include <linux/dvs_suite.h>
-#include <linux/kernel.h>
-#include <linux/list.h>
-#include <linux/sched.h>
-#endif	// CONFIG_LGE_DVFS
-
 #define CREATE_TRACE_POINTS
 #include <trace/events/sched.h>
 
@@ -2772,9 +2764,6 @@ context_switch(struct rq *rq, struct task_struct *prev,
 	       struct task_struct *next)
 {
 	struct mm_struct *mm, *oldmm;
-#ifdef CONFIG_LGE_DVFS
-	int ds_cpu = smp_processor_id();
-#endif	// CONFIG_LGE_DVFS
 
 	prepare_task_switch(rq, prev, next);
 	trace_sched_switch(prev, next);
@@ -2807,16 +2796,6 @@ context_switch(struct rq *rq, struct task_struct *prev,
 #ifndef __ARCH_WANT_UNLOCKED_CTXSW
 	spin_release(&rq->lock.dep_map, 1, _THIS_IP_);
 #endif
-
-#ifdef CONFIG_LGE_DVFS
-	if(ds_control.on_dvs == 1)
-	{
-		ds_parameter.entry_type = DS_ENTRY_SWITCH_TO;
-		ds_parameter.prev_p = prev;
-		ds_parameter.next_p = next;
-		ld_do_dvs_suite(ds_cpu);
-	}
-#endif	// CONFIG_LGE_DVFS
 
 	/* Here we just switch the register state and the stack. */
 	switch_to(prev, next, prev);
@@ -3434,22 +3413,6 @@ void scheduler_tick(void)
 	struct rq *rq = cpu_rq(cpu);
 	struct task_struct *curr = rq->curr;
 
-#ifdef CONFIG_LGE_DVFS
-	if(ds_control.on_dvs == 1){
-		ds_update_time_counter(cpu);
-		ds_parameter.entry_type = DS_ENTRY_TIMER_IRQ;
-		ds_parameter.prev_p = current;
-		ds_parameter.next_p = current;
-		do_dvs_suite(cpu);
-		if(ds_control.flag_run_dvs == 1){
-			if(per_cpu(ds_cpu_status, cpu).target_cpu_op_index != 
-				per_cpu(ds_cpu_status, cpu).current_cpu_op_index)
-			{
-				queue_work_on(cpu, dvs_suite_wq, &dvs_suite_work);
-			}
-		}
-	}
-#endif	// CONFIG_LGE_DVFS
 	sched_clock_tick();
 
 	raw_spin_lock(&rq->lock);
@@ -3619,14 +3582,6 @@ asmlinkage void __sched schedule(void)
 	unsigned long *switch_count;
 	struct rq *rq;
 	int cpu;
-#ifdef CONFIG_LGE_DVFS
-	int ds_cpu = smp_processor_id();
-
-	if(ds_control.on_dvs == 1)
-	{
-		per_cpu(ds_cpu_status, ds_cpu).cpu_mode = DS_CPU_MODE_SCHEDULE;
-	}
-#endif	// CONFIG_LGE_DVFS
 
 need_resched:
 	preempt_disable();
@@ -3692,16 +3647,6 @@ need_resched_nonpreemptible:
 	preempt_enable_no_resched();
 	if (need_resched())
 		goto need_resched;
-
-#ifdef CONFIG_LGE_DVFS
-	if(ds_control.on_dvs == 1)
-	{
-		if(next->pid == 0)
-			per_cpu(ds_cpu_status, ds_cpu).cpu_mode = DS_CPU_MODE_IDLE;
-		else
-			per_cpu(ds_cpu_status, ds_cpu).cpu_mode = DS_CPU_MODE_TASK;
-	}
-#endif	// CONFIG_LGE_DVFS
 }
 EXPORT_SYMBOL(schedule);
 

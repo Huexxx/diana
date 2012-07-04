@@ -26,11 +26,6 @@
 #include <plat/voltage.h>
 #endif
 #include <plat/smartreflex.h>
-
-#ifdef CONFIG_LGE_DVFS
-#include <linux/dvs_suite.h>
-#endif	// CONFIG_LGE_DVFS
-
 #include "omap3-opp.h"
 #include "opp44xx.h"
 
@@ -456,9 +451,6 @@ static ssize_t vdd_opp_show(struct kobject *kobj, struct kobj_attribute *attr, c
 static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t n)
 {
 	unsigned long value;
-#ifdef CONFIG_LGE_DVFS
-	unsigned long lc_freq = 0;
-#endif	// CONFIG_LGE_DVFS
 
 	if (sscanf(buf, "%lu", &value) != 1)
 		return -EINVAL;
@@ -478,9 +470,6 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 					printk(KERN_ERR "%s: Failed to remove vdd1_lock\n", __func__);
 				} else {
 					vdd1_locked = 0;
-#ifdef CONFIG_LGE_DVFS
-					per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 300000000;
-#endif	// CONFIG_LGE_DVFS
 					return n;
 				}
 			} else {
@@ -500,9 +489,6 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				for (i = 0; freq_table[i].frequency != CPUFREQ_TABLE_END; i++) {
 					if (freq_table[i].index == value - 1) {
 						freq = freq_table[i].frequency;
-#ifdef CONFIG_LGE_DVFS
-						lc_freq = freq * 1000;
-#endif	// CONFIG_LGE_DVFS
 						break;
 					}
 				}
@@ -513,9 +499,6 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				if (omap_pm_set_min_mpu_freq(&sysfs_cpufreq_dev, freq * 1000)) {
 					printk(KERN_ERR "%s: Failed to add vdd1_lock\n", __func__);
 				} else {
-#ifdef CONFIG_LGE_DVFS
-					per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = lc_freq;
-#endif	// CONFIG_LGE_DVFS
 					vdd1_locked = value;
 				}
 			} else {
@@ -530,9 +513,6 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				if (omap_pm_set_min_bus_tput(&sysfs_cpufreq_dev, OCP_INITIATOR_AGENT, 0)) {
 					printk(KERN_ERR "%s: Failed to remove vdd2_lock\n", __func__);
 				} else {
-#ifdef CONFIG_LGE_DVFS
-					per_cpu(ds_sys_status, 0).locked_min_l3_freq = 0;
-#endif	// CONFIG_LGE_DVFS
 					vdd2_locked = 0;
 					return n;
 				}
@@ -547,14 +527,8 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				if (cpu_is_omap3630()) {
 					if(value == 1) {
 						freq = 100*1000*4;
-#ifdef CONFIG_LGE_DVFS
-						lc_freq = 100000000;
-#endif	// CONFIG_LGE_DVFS
 					} else if (value == 2) {
 						freq = 200*1000*4;
-#ifdef CONFIG_LGE_DVFS
-						lc_freq = 200000000;
-#endif	// CONFIG_LGE_DVFS
 					} else {
 						printk(KERN_ERR "%s: Invalid value [1,2]\n", __func__);
 						return -EINVAL;
@@ -589,9 +563,6 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				if (omap_pm_set_min_bus_tput(&sysfs_cpufreq_dev, OCP_INITIATOR_AGENT, freq)) {
 					printk(KERN_ERR "%s: Failed to add vdd2_lock\n", __func__);
 				} else {
-#ifdef CONFIG_LGE_DVFS
-					per_cpu(ds_sys_status, 0).locked_min_l3_freq = lc_freq;
-#endif	// CONFIG_LGE_DVFS
 					vdd2_locked = value;
 				}
 				return n;
@@ -610,30 +581,6 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 		for (i = 1; opp_table[i].rate; i++) {
 			if (opp_table[i].rate >= value) {
 				opp_id = i;
-#ifdef CONFIG_LGE_DVFS
-				switch(i){
-					case 1:
-						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 300000000;	// Unlocked.
-						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 260000000;
-						break;
-					case 2:
-						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 600000000;
-						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 520000000;
-						break;
-					case 3:
-						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 800000000;
-						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 660000000;
-						break;
-					case 4:
-						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1000000000;
-						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 800000000;
-						break;
-					default:
-						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1000000000;
-						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 800000000;
-						break;
-				}
-#endif	// CONFIG_LGE_DVFS
 				break;
 			}
 		}

@@ -29,10 +29,6 @@
 #include <linux/completion.h>
 #include <linux/mutex.h>
 
-#ifdef CONFIG_LGE_DVFS
-#include <linux/dvs_suite.h>
-#endif	// CONFIG_LGE_DVFS
-
 #define dprintk(msg...) cpufreq_debug_printk(CPUFREQ_DEBUG_CORE, \
 						"cpufreq-core", msg)
 
@@ -48,10 +44,6 @@ static DEFINE_PER_CPU(struct cpufreq_policy *, cpufreq_cpu_data);
 static DEFINE_PER_CPU(char[CPUFREQ_NAME_LEN], cpufreq_cpu_governor);
 #endif
 static DEFINE_SPINLOCK(cpufreq_driver_lock);
-
-#ifdef CONFIG_LGE_DVFS
-static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char *buf, size_t count);
-#endif	// CONFIG_LGE_DVFS
 
 /*
  * cpu_policy_rwsem is a per CPU reader-writer semaphore designed to cure
@@ -470,57 +462,7 @@ show_one(scaling_cur_freq, cur);
 static int __cpufreq_set_policy(struct cpufreq_policy *data,
 				struct cpufreq_policy *policy);
 
-#ifdef CONFIG_LGE_DVFS
-static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char *buf, size_t count)
-{
-	unsigned int ret = -EINVAL;
-	struct cpufreq_policy new_policy;
 
-	ret = cpufreq_get_policy(&new_policy, policy->cpu);
-	if(ret)
-		return -EINVAL;
-
-	ret = sscanf(buf, "%u", &new_policy.min);
-	if(ret != 1)
-		return -EINVAL;
-
-	ret = __cpufreq_set_policy(policy, &new_policy);
-	policy->user_policy.min = policy->min;
-
-	//printk(KERN_WARNING "store_scaling_min_freq(): To %u\n", policy->min);
-	if(ds_control.on_dvs == 1)
-	{
-		per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = policy->min;
-	}
-
-	return ret ? ret : count;
-}
-
-static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char *buf, size_t count)
-{
-	unsigned int ret = -EINVAL;
-	struct cpufreq_policy new_policy;
-
-	ret = cpufreq_get_policy(&new_policy, policy->cpu);
-	if(ret)
-		return -EINVAL;
-
-	ret = sscanf(buf, "%u", &new_policy.max);
-	if(ret != 1)
-		return -EINVAL;
-
-	ret = __cpufreq_set_policy(policy, &new_policy);
-	policy->user_policy.max = policy->max;
-
-	//printk(KERN_WARNING "store_scaling_max_freq(): To %u\n", policy->max);
-	if(ds_control.on_dvs == 1)
-	{
-		per_cpu(ds_sys_status, 0).locked_max_cpu_op_index = policy->max;
-	}
-
-	return ret ? ret : count;
-}
-#else	// CONFIG_LGE_DVFS
 /**
  * cpufreq_per_cpu_attr_write() / store_##file_name() - sysfs write access
  */
@@ -547,7 +489,7 @@ static ssize_t store_##file_name					\
 
 store_one(scaling_min_freq, min);
 store_one(scaling_max_freq, max);
-#endif	// CONFIG_LGE_DVFS
+
 
 /**
  * show_cpuinfo_cur_freq - current CPU frequency as detected by hardware
@@ -707,64 +649,6 @@ static ssize_t show_scaling_setspeed(struct cpufreq_policy *policy, char *buf)
 	return policy->governor->show_setspeed(policy, buf);
 }
 
-#ifdef CONFIG_LGE_DVFS
-static ssize_t store_turn_on_lg_dvfs(struct cpufreq_policy *policy, const char *buf,
-                        size_t count)
-{
-    int value;
-
-    sscanf(buf, "%d", &value);
-
-	if(value == 0){
-        printk(KERN_WARNING "[LG-DVFS] LG-DVFS was turned off\n");
-		ds_control.on_dvs = 0;
-		ds_control.flag_run_dvs = 0;
-		dvs_suite_timer_exit();
-		destroy_workqueue(dvs_suite_wq);
-    }
-	else{
-		if(value == -2){
-			ds_control.aidvs_moving_avg_weight = 0;
-		}
-		else if(value == -1){
-			ds_control.aidvs_moving_avg_weight = 1;
-		}
-		else if(value == 1){
-			printk(KERN_WARNING "[LG-DVFS] LG-DVFS is ready to run\n");
-			/* Initialize LG-DVFS upon enabling it */
-			ld_initialize_ds_control();
-			ld_initialize_ds_sys_status();
-			ld_initialize_ds_cpu_status(DS_CPU_MODE_TASK);
-			ld_initialize_ds_counter();
-			ld_initialize_aidvs();
-			ds_control.on_dvs = 1;
-			dvs_suite_wq = create_workqueue("dvs_suite");
-			dvs_suite_timer_init();
-		}
-		else if(value < 10){
-			ds_control.aidvs_moving_avg_weight = value;
-		}
-		else if(value < 1000000){
-			ds_control.aidvs_interval_length = value;
-		}
-		else{
-			printk(KERN_ERR "store_turn_on_lg_dvfs: Invalid value\n");
-			return -EINVAL;
-		}
-	}
-
-    return count;
-}
-
-static ssize_t show_turn_on_lg_dvfs(struct cpufreq_policy *policy, char *buf)
-{
-	int ret;
-
-	ret = ds_control.on_dvs;
-
-    return sprintf(buf, "%d\n", ret);
-}
-#endif	// CONFIG_LGE_DVFS
 
 /**
  * show_scaling_driver - show the current cpufreq HW/BIOS limitation
@@ -795,9 +679,6 @@ cpufreq_freq_attr_rw(scaling_min_freq);
 cpufreq_freq_attr_rw(scaling_max_freq);
 cpufreq_freq_attr_rw(scaling_governor);
 cpufreq_freq_attr_rw(scaling_setspeed);
-#ifdef CONFIG_LGE_DVFS
-cpufreq_freq_attr_rw(turn_on_lg_dvfs);
-#endif	// CONFIG_LGE_DVFS
 
 static struct attribute *default_attrs[] = {
 	&cpuinfo_min_freq.attr,
@@ -811,9 +692,6 @@ static struct attribute *default_attrs[] = {
 	&scaling_driver.attr,
 	&scaling_available_governors.attr,
 	&scaling_setspeed.attr,
-#ifdef CONFIG_LGE_DVFS
-	&turn_on_lg_dvfs.attr,
-#endif	// CONFIG_LGE_DVFS
 	NULL
 };
 
@@ -1505,6 +1383,7 @@ out:
 	return ret;
 }
 
+
 /**
  *	cpufreq_resume -  restore proper CPU frequency handling after resume
  *
@@ -1526,18 +1405,6 @@ static int cpufreq_resume(struct sys_device *sysdev)
 
 	if (!cpu_online(cpu))
 		return 0;
-
-#ifdef CONFIG_LGE_DVFS
-	if(ds_control.flag_run_dvs == 1)
-	{
-		printk(KERN_WARNING "[LG-DVFS] LG-DVFS is resuming for cpu %d\n", cpu);
-		ld_initialize_ds_control();
-		ld_initialize_ds_sys_status();
-		ld_initialize_ds_cpu_status(DS_CPU_MODE_TASK);
-		ld_initialize_ds_counter();
-		ld_initialize_aidvs();
-	}
-#endif	// CONFIG_LGE_DVFS
 
 	/* we may be lax here as interrupts are off. Nonetheless
 	 * we need to grab the correct cpu policy, as to check

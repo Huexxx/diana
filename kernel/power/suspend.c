@@ -242,16 +242,10 @@ int suspend_devices_and_enter(suspend_state_t state)
 	if (suspend_test(TEST_DEVICES))
 		goto Recover_platform;
 
-#ifndef CONFIG_LGE_DVFS
 	omap_pm_set_min_bus_tput(&l3_dev, OCP_INITIATOR_AGENT, 100 * 1000 * 4);
-#endif	// CONFIG_LGE_DVFS
-
 	suspend_enter(state);
-
-#ifndef CONFIG_LGE_DVFS
 	omap_pm_set_min_bus_tput(&l3_dev, OCP_INITIATOR_AGENT, 200 * 1000 * 4);
-#endif	// CONFIG_LGE_DVFS
-	
+
 Resume_devices:
 	suspend_test_start();
 	dpm_resume_end(PMSG_RESUME);

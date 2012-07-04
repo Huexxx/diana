@@ -291,16 +291,4 @@ config CPU_FREQ_GOV_ONDEMANDX_INPUT
 	  Enable installation of an input event handler which will ramp up the
 	  CPU to max frequency when an input event is received.
 
-# 20110331 sookyoung.kim@lge.com LG-DVFS [START_LGE]
-config LGE_DVFS
- 	tristate "LG-DVFS"
- 	help
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called cpufreq_conservative.
- 
- 	  For details, take a look at linux/Documentation/cpu-freq.
- 
- 	  If in doubt, say N.
-# 20110331 sookyoung.kim@lge.com LG-DVFS [END_LGE]
-
 endif	# CPU_FREQ

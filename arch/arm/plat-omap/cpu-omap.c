@@ -33,10 +33,6 @@
 #include <asm/cpu.h>
 #include <plat/omap_device.h>
 
-#ifdef CONFIG_LGE_DVFS
-#include <linux/dvs_suite.h>
-#endif	// CONFIG_LGE_DVFS
-
 #if defined(CONFIG_ARCH_OMAP3) || defined(CONFIG_ARCH_OMAP4)
 #include <plat/omap-pm.h>
 #include <plat/opp.h>
@@ -180,9 +176,6 @@ static int omap_target(struct cpufreq_policy *policy,
 
 	freq = target_freq * 1000;
 	if (opp_find_freq_ceil(mpu_dev, &freq))
-#ifdef CONFIG_LGE_DVFS
-		if(per_cpu(ds_control, 0).flag_run_dvs == 0)
-#endif	// CONFIG_LGE_DVFS
 		omap_device_set_rate(mpu_dev, mpu_dev, freq);
 
 #ifdef CONFIG_SMP
@@ -203,9 +196,6 @@ static int omap_target(struct cpufreq_policy *policy,
 	}
 #endif
 #endif
-#ifdef CONFIG_LGE_DVFS
-	if(per_cpu(ds_control, 0).flag_run_dvs == 0)
-#endif	// CONFIG_LGE_DVFS
 	omap_pm_cpu_set_freq(freq);
 	return ret;
 }

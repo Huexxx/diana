@@ -23,10 +23,6 @@
 #include <linux/latencytop.h>
 #include <linux/sched.h>
 
-#ifdef CONFIG_LGE_DVFS
-#include <linux/dvs_suite.h>
-#endif	// CONFIG_LGE_DVFS
-
 /*
  * Targeted preemption latency for CPU-bound tasks:
  * (default: 5ms * (1 + ilog(ncpus)), units: nanoseconds)
@@ -3528,15 +3524,6 @@ static void task_tick_fair(struct rq *rq, struct task_struct *curr, int queued)
 {
 	struct cfs_rq *cfs_rq;
 	struct sched_entity *se = &curr->se;
-
-#ifdef CONFIG_LGE_DVFS
-	int ds_cpu = smp_processor_id();
-
-	if(ds_control.flag_run_dvs == 1)
-	{
-		ld_update_priority_normal(ds_cpu, curr);
-	}
-#endif	// CONFIG_LGE_DVFS
 
 	for_each_sched_entity(se) {
 		cfs_rq = cfs_rq_of(se);
