@@ -230,7 +230,6 @@ static struct kobj_attribute overclock_vdd_opp4_attr =
     __ATTR(overclock_vdd_opp4, 0644, overclock_vdd_show, overclock_vdd_store);
 static struct kobj_attribute overclock_vdd_opp5_attr =
     __ATTR(overclock_vdd_opp5, 0644, overclock_vdd_show, overclock_vdd_store);
-#ifdef CONFIG_P970_OPPS_ENABLED
 static struct kobj_attribute overclock_vdd_opp6_attr =
     __ATTR(overclock_vdd_opp6, 0644, overclock_vdd_show, overclock_vdd_store);
 static struct kobj_attribute overclock_vdd_opp7_attr =
@@ -239,6 +238,15 @@ static struct kobj_attribute overclock_vdd_opp8_attr =
     __ATTR(overclock_vdd_opp8, 0644, overclock_vdd_show, overclock_vdd_store);
 static struct kobj_attribute overclock_vdd_opp9_attr =
     __ATTR(overclock_vdd_opp9, 0644, overclock_vdd_show, overclock_vdd_store);
+#ifdef CONFIG_P970_OPPS_ENABLED
+static struct kobj_attribute overclock_vdd_opp10_attr =
+    __ATTR(overclock_vdd_opp10, 0644, overclock_vdd_show, overclock_vdd_store);
+static struct kobj_attribute overclock_vdd_opp11_attr =
+    __ATTR(overclock_vdd_opp11, 0644, overclock_vdd_show, overclock_vdd_store);
+static struct kobj_attribute overclock_vdd_opp12_attr =
+    __ATTR(overclock_vdd_opp12, 0644, overclock_vdd_show, overclock_vdd_store);
+static struct kobj_attribute overclock_vdd_opp13_attr =
+    __ATTR(overclock_vdd_opp13, 0644, overclock_vdd_show, overclock_vdd_store);
 #endif
 #endif
 
@@ -295,7 +303,6 @@ static ssize_t overclock_vdd_show(struct kobject *kobj,
 	if ( attr == &overclock_vdd_opp5_attr) {
 		target_opp = 5;
 	}
-#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_vdd_opp6_attr) {
 		target_opp = 6;
 	}
@@ -308,8 +315,20 @@ static ssize_t overclock_vdd_show(struct kobject *kobj,
 	if ( attr == &overclock_vdd_opp9_attr) {
 		target_opp = 9;
 	}
+#ifdef CONFIG_P970_OPPS_ENABLED
+	if ( attr == &overclock_vdd_opp10_attr) {
+		target_opp = 10;
+	}
+	if ( attr == &overclock_vdd_opp11_attr) {
+		target_opp = 11;
+	}
+	if ( attr == &overclock_vdd_opp12_attr) {
+		target_opp = 12;
+	}
+	if ( attr == &overclock_vdd_opp13_attr) {
+		target_opp = 13;
+	}
 #endif
-
 	temp_opp = opp_find_freq_exact(mpu_dev, mpu_freq_table[target_opp].frequency*1000, true);
 	if(IS_ERR(temp_opp))
 		return -EINVAL;
@@ -373,7 +392,6 @@ static ssize_t overclock_vdd_store(struct kobject *k,
 		vdd_lower_limit = 1100000;
 		vdd_upper_limit = 1500000;
 	}
-#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_vdd_opp6_attr) {
 		target_opp_nr = 6;
 		vdd_lower_limit = 1200000;
@@ -391,6 +409,27 @@ static ssize_t overclock_vdd_store(struct kobject *k,
 	}
 	if ( attr == &overclock_vdd_opp9_attr) {
 		target_opp_nr = 9;
+		vdd_lower_limit = 1200000;
+		vdd_upper_limit = 1600000;
+	}
+#ifdef CONFIG_P970_OPPS_ENABLED
+	if ( attr == &overclock_vdd_opp10_attr) {
+		target_opp_nr = 10;
+		vdd_lower_limit = 1200000;
+		vdd_upper_limit = 1600000;
+	}
+	if ( attr == &overclock_vdd_opp11_attr) {
+		target_opp_nr = 11;
+		vdd_lower_limit = 1200000;
+		vdd_upper_limit = 1600000;
+	}
+	if ( attr == &overclock_vdd_opp12_attr) {
+		target_opp_nr = 12;
+		vdd_lower_limit = 1200000;
+		vdd_upper_limit = 1600000;
+	}
+	if ( attr == &overclock_vdd_opp13_attr) {
+		target_opp_nr = 13;
 		vdd_lower_limit = 1200000;
 		vdd_upper_limit = 1600000;
 	}
@@ -812,7 +851,6 @@ static int __init omap2_common_pm_init(void)
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 			return error;
 		}
-#ifdef CONFIG_P970_OPPS_ENABLED
 		error = sysfs_create_file(power_kobj, &overclock_vdd_opp6_attr.attr);
 		if (error) {
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
@@ -829,6 +867,27 @@ static int __init omap2_common_pm_init(void)
 			return error;
 		}
 		error = sysfs_create_file(power_kobj, &overclock_vdd_opp9_attr.attr);
+		if (error) {
+			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+			return error;
+		}
+#ifdef CONFIG_P970_OPPS_ENABLED
+		error = sysfs_create_file(power_kobj, &overclock_vdd_opp10_attr.attr);
+		if (error) {
+			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+			return error;
+		}
+		error = sysfs_create_file(power_kobj, &overclock_vdd_opp11_attr.attr);
+		if (error) {
+			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+			return error;
+		}
+		error = sysfs_create_file(power_kobj, &overclock_vdd_opp12_attr.attr);
+		if (error) {
+			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+			return error;
+		}
+		error = sysfs_create_file(power_kobj, &overclock_vdd_opp13_attr.attr);
 		if (error) {
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 			return error;

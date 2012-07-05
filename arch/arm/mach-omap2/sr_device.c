@@ -97,9 +97,9 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 				struct omap_sr_data *sr_data)
 {
 	bool is_mpu;
-	int i;
+	int i, j = 0;
 	u32 uppernslope, upperpslope;
-	u32 uppernslope2, upperpslope2;
+	u32 centernslope, centerpslope;
 	u32 lowernslope, lowerpslope;
 	void __iomem *ctrl_base;
 
@@ -154,7 +154,7 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 		} else {
 			dev_data->volt_data[i].sr_nvalue = omap_ctrl_readl(
 				dev_data->efuse_nvalues_offs[i]);
-			if ((i > 1) && (i < 6) && (is_mpu)) {
+			if (((i == 2) || (i == 5) || (i == 7) || (i == 9)) && (is_mpu)) {
 				u32 fac_senpgain, fac_senngain;
 				u32 fac_rnsenp, fac_rnsenn;
 				/* Obtaining all the needed factory values */
@@ -162,22 +162,23 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 				fac_senngain = (dev_data->volt_data[i].sr_nvalue & 0x000f0000) >> 0x10;
 				fac_rnsenp = (dev_data->volt_data[i].sr_nvalue & 0x0000ff00) >> 0x8;
 				fac_rnsenn = (dev_data->volt_data[i].sr_nvalue & 0x000000ff);
-				fac_senpval[i-2] = ((1 << (fac_senpgain + 8))/fac_rnsenp);
-				fac_sennval[i-2] = ((1 << (fac_senngain + 8))/fac_rnsenn);
+				fac_senpval[j] = ((1 << (fac_senpgain + 8))/fac_rnsenp);
+				fac_sennval[j] = ((1 << (fac_senngain + 8))/fac_rnsenn);
+				j++;
 			}
 		}
 	}
 
 	if (is_mpu) {
-		/* Calculating the estimated upper slope (x1000) */
-		uppernslope = (((2 * fac_sennval[3]) + fac_sennval[1] - (3 * fac_sennval[2])) * 5);
-		upperpslope = (((2 * fac_senpval[3]) + fac_senpval[1] - (3 * fac_senpval[2])) * 5);
+		/* Calculating the upper slope (x1000) */
+		uppernslope = ((fac_sennval[3] - fac_sennval[2]) * 5);
+		upperpslope = ((fac_senpval[3] - fac_senpval[2]) * 5);
 
-		/* Calculating the last upper slope (x1000) */
-		uppernslope2 = ((fac_sennval[3] - fac_sennval[2]) * 5);
-		upperpslope2 = ((fac_senpval[3] - fac_senpval[2]) * 5);
+		/* Calculating the central slope (x1000) */
+		centernslope = ((fac_sennval[2] - fac_sennval[1]) * 5);
+		centerpslope = ((fac_senpval[2] - fac_senpval[1]) * 5);
 
-		/* Calculating the first lower slope (x900) */
+		/* Calculating the lower slope (x900) */
 		lowernslope = ((fac_sennval[1] - fac_sennval[0]) * 3);
 		lowerpslope = ((fac_senpval[1] - fac_senpval[0]) * 3);
 	}
@@ -192,23 +193,39 @@ static void __init sr_read_efuse(struct omap_sr_dev_data *dev_data,
 			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
 				fac_sennval[0] - (lowernslope / 9),
 				fac_senpval[0] - (lowerpslope / 9));
-#ifdef CONFIG_P970_OPPS_ENABLED
+		} else if ((i == 3) && (is_mpu)) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[0] + (lowernslope / 9),
+				fac_senpval[0] + (lowerpslope / 9));
+		} else if ((i == 4) && (is_mpu)) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[0] + (lowernslope * 2 / 9),
+				fac_senpval[0] + (lowerpslope * 2 / 9));
 		} else if (i == 6) {
 			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
-				fac_sennval[3] + (min(uppernslope,uppernslope2) / 10),
-				fac_senpval[3] + (min(upperpslope,upperpslope2) / 10));
-		} else if (i == 7) {
-			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
-				fac_sennval[3] + (min(uppernslope,uppernslope2) / 5),
-				fac_senpval[3] + (min(upperpslope,upperpslope2) / 5));
+				fac_sennval[1] + (centernslope / 10),
+				fac_senpval[1] + (centerpslope / 10));
 		} else if (i == 8) {
 			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
-				fac_sennval[3] + (min(uppernslope,uppernslope2) * 3 / 10),
-				fac_senpval[3] + (min(upperpslope,upperpslope2) * 3 / 10));
-		} else if (i == 9) {
+				fac_sennval[2] + (uppernslope / 10),
+				fac_senpval[2] + (upperpslope / 10));
+#ifdef CONFIG_P970_OPPS_ENABLED
+		} else if (i == 10) {
 			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
-				fac_sennval[3] + (min(uppernslope,uppernslope2) * 35 / 100),
-				fac_senpval[3] + (min(upperpslope,upperpslope2) * 35 / 100));
+				fac_sennval[3] + (uppernslope / 10),
+				fac_senpval[3] + (upperpslope / 10));
+		} else if (i == 11) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[3] + (uppernslope / 5),
+				fac_senpval[3] + (upperpslope / 5));
+		} else if (i == 12) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[3] + (uppernslope * 3 / 10),
+				fac_senpval[3] + (upperpslope * 3 / 10));
+		} else if (i == 13) {
+			dev_data->volt_data[i].sr_nvalue = cal_opp_nvalue(
+				fac_sennval[3] + (uppernslope * 35 / 100),
+				fac_senpval[3] + (upperpslope * 35 / 100));
 #endif
 		}
 		/* Log eFUSE values to debug ... */

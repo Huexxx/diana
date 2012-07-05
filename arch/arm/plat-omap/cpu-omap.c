@@ -79,7 +79,6 @@ static struct kobj_attribute overclock_opp4_attr =
 	__ATTR(overclock_opp4, 0644, overclock_show, overclock_store);
 static struct kobj_attribute overclock_opp5_attr =
 	__ATTR(overclock_opp5, 0644, overclock_show, overclock_store);
-#ifdef CONFIG_P970_OPPS_ENABLED
 static struct kobj_attribute overclock_opp6_attr =
 	__ATTR(overclock_opp6, 0644, overclock_show, overclock_store);
 static struct kobj_attribute overclock_opp7_attr =
@@ -88,6 +87,15 @@ static struct kobj_attribute overclock_opp8_attr =
 	__ATTR(overclock_opp8, 0644, overclock_show, overclock_store);
 static struct kobj_attribute overclock_opp9_attr =
 	__ATTR(overclock_opp9, 0644, overclock_show, overclock_store);
+#ifdef CONFIG_P970_OPPS_ENABLED
+static struct kobj_attribute overclock_opp10_attr =
+	__ATTR(overclock_opp10, 0644, overclock_show, overclock_store);
+static struct kobj_attribute overclock_opp11_attr =
+	__ATTR(overclock_opp11, 0644, overclock_show, overclock_store);
+static struct kobj_attribute overclock_opp12_attr =
+	__ATTR(overclock_opp12, 0644, overclock_show, overclock_store);
+static struct kobj_attribute overclock_opp13_attr =
+	__ATTR(overclock_opp13, 0644, overclock_show, overclock_store);
 #endif
 #endif
 
@@ -307,7 +315,6 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 		return error;
 	}
-#ifdef CONFIG_P970_OPPS_ENABLED
 	error = sysfs_create_file(power_kobj, &overclock_opp6_attr.attr);
 	if (error) {
 		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
@@ -324,6 +331,27 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 		return error;
 	}
 	error = sysfs_create_file(power_kobj, &overclock_opp9_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+#ifdef CONFIG_P970_OPPS_ENABLED
+	error = sysfs_create_file(power_kobj, &overclock_opp10_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &overclock_opp11_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &overclock_opp12_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &overclock_opp13_attr.attr);
 	if (error) {
 		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 		return error;
@@ -390,7 +418,6 @@ static ssize_t overclock_show(struct kobject *kobj,
 		target_opp_nr = 4;
 	if ( attr == &overclock_opp5_attr)
 		target_opp_nr = 5;
-#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_opp6_attr)
 		target_opp_nr = 6;
 	if ( attr == &overclock_opp7_attr)
@@ -399,6 +426,15 @@ static ssize_t overclock_show(struct kobject *kobj,
 		target_opp_nr = 8;
 	if ( attr == &overclock_opp9_attr)
 		target_opp_nr = 9;
+#ifdef CONFIG_P970_OPPS_ENABLED
+	if ( attr == &overclock_opp10_attr)
+		target_opp_nr = 10;
+	if ( attr == &overclock_opp11_attr)
+		target_opp_nr = 11;
+	if ( attr == &overclock_opp12_attr)
+		target_opp_nr = 12;
+	if ( attr == &overclock_opp13_attr)
+		target_opp_nr = 13;
 #endif
 	
 	//Find opp (1 MHZ steps)
@@ -438,63 +474,73 @@ static ssize_t overclock_store(struct kobject *k,
 	// Hard coded clock limits
 	if (attr == &overclock_opp0_attr) {
 		target_opp_nr = 0;
-		//volt_nominal = 900000;
-		opp_lower_limit = 100;
+		opp_lower_limit = 50;
 		opp_upper_limit = 150;
 	}
 	if (attr == &overclock_opp1_attr) {
 		target_opp_nr = 1;
-		//volt_nominal = 950000;
 		opp_lower_limit = 151;
 		opp_upper_limit = 250;
 	}
 	if (attr == &overclock_opp2_attr) {
 		target_opp_nr = 2;
-		//volt_nominal = 1000000;
 		opp_lower_limit = 251;
-		opp_upper_limit = 450;
+		opp_upper_limit = 350;
 	}
 	if (attr == &overclock_opp3_attr) {
 		target_opp_nr = 3;
-		//volt_nominal = 1162500;
-		opp_lower_limit = 451;
-		opp_upper_limit = 700;
+		opp_lower_limit = 351;
+		opp_upper_limit = 450;
 	}
 	if (attr == &overclock_opp4_attr) {
 		target_opp_nr = 4;
-		//volt_nominal = 1300000;
-		opp_lower_limit = 701;
-		opp_upper_limit = 900;
+		opp_lower_limit = 451;
+		opp_upper_limit = 550;
 	}
 	if ( attr == &overclock_opp5_attr) {
 		target_opp_nr = 5;
-		//volt_nominal = 1350000;
-		opp_lower_limit = 901;
-		opp_upper_limit = 1050;
+		opp_lower_limit = 551;
+		opp_upper_limit = 650;
 	}
-#ifdef CONFIG_P970_OPPS_ENABLED
 	if ( attr == &overclock_opp6_attr) {
 		target_opp_nr = 6;
-		//volt_nominal = 1400000;
-		opp_lower_limit = 1051;
-		opp_upper_limit = 1150;
+		opp_lower_limit = 651;
+		opp_upper_limit = 750;
 	}
 	if ( attr == &overclock_opp7_attr) {
 		target_opp_nr = 7;
-		//volt_nominal = 1450000;
-		opp_lower_limit = 1151;
-		opp_upper_limit = 1250;
+		opp_lower_limit = 751;
+		opp_upper_limit = 850;
 	}
 	if ( attr == &overclock_opp8_attr) {
 		target_opp_nr = 8;
-		//volt_nominal = 1500000;
-		opp_lower_limit = 1251;
-		opp_upper_limit = 1300;
+		opp_lower_limit = 851;
+		opp_upper_limit = 950;
 	}
 	if ( attr == &overclock_opp9_attr) {
 		target_opp_nr = 9;
-		//volt_nominal = 1550000;
-		opp_lower_limit = 1301;
+		opp_lower_limit = 951;
+		opp_upper_limit = 1050;
+	}
+#ifdef CONFIG_P970_OPPS_ENABLED
+	if ( attr == &overclock_opp10_attr) {
+		target_opp_nr = 10;
+		opp_lower_limit = 1051;
+		opp_upper_limit = 1150;
+	}
+	if ( attr == &overclock_opp11_attr) {
+		target_opp_nr = 11;
+		opp_lower_limit = 1151;
+		opp_upper_limit = 1250;
+	}
+	if ( attr == &overclock_opp12_attr) {
+		target_opp_nr = 12;
+		opp_lower_limit = 1251;
+		opp_upper_limit = 1325;
+	}
+	if ( attr == &overclock_opp13_attr) {
+		target_opp_nr = 13;
+		opp_lower_limit = 1326;
 		opp_upper_limit = 1400;
 	}
 #endif
@@ -534,11 +580,11 @@ static ssize_t overclock_store(struct kobject *k,
 				mpu_policy->cpuinfo.min_freq = freq/1000;
 			}
 #ifdef CONFIG_P970_OPPS_ENABLED
-			if(target_opp_nr == 9) {
+			if(target_opp_nr == 13) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #else
-			if(target_opp_nr == 5) {
+			if(target_opp_nr == 9) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #endif
