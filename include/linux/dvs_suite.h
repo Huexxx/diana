@@ -55,18 +55,46 @@
 	set_opp(&vdd1_opp, VDD1_OPP3)
 	set_opp(&vdd1_opp, VDD1_OPP2)
 	set_opp(&vdd1_opp, VDD1_OPP1)
+
+	Huexxx: Modified operating points...
+
+	CPU_OP 0:  (1350 MHz),	Scaling factor 1		= 0x1000 in fixed point number
+	CPU_OP 1:  (1300 MHz),	Scaling factor 0.962962...	= 0xf68
+	CPU_OP 2:  (1200 MHz),	Scaling factor 0.88...		= 0xe39
+	CPU_OP 3:  (1100 MHz),	Scaling factor 0.814814...	= 0xd09
+	CPU_OP 4:  (1000 MHz),	Scaling factor 0.740740...	= 0xbda
+	CPU_OP 5:  ( 900 MHz),	Scaling factor 0.66...		= 0xaab
+	CPU_OP 6:  ( 800 MHz),	Scaling factor 0.592592...	= 0x97b
+	CPU_OP 7:  ( 700 MHz),	Scaling factor 0.518518...	= 0x84c
+	CPU_OP 8:  ( 600 MHz),	Scaling factor 0.44...		= 0x71c
+	CPU_OP 9:  ( 500 MHz),	Scaling factor 0.370370...	= 0x5ed
+	CPU_OP 10: ( 400 MHz),	Scaling factor 0.296296...	= 0x4be
+	CPU_OP 11: ( 300 MHz),	Scaling factor 0.22...		= 0x38e
+	CPU_OP 12: ( 200 MHz),	Scaling factor 0.148148...	= 0x25f
+	CPU_OP 13: ( 100 MHz),	Scaling factor 0.074074...	= 0x12f
+
  */
 
 /* The CPU_OP indices */
-#define DS_CPU_OP_INDEX_0	1000000000
-#define DS_CPU_OP_INDEX_1	800000000
-#define DS_CPU_OP_INDEX_2	600000000
-#define DS_CPU_OP_INDEX_3	300000000
+#define DS_CPU_OP_INDEX_0	1350000000
+#define DS_CPU_OP_INDEX_1	1300000000
+#define DS_CPU_OP_INDEX_2	1200000000
+#define DS_CPU_OP_INDEX_3	1100000000
+#define DS_CPU_OP_INDEX_4	1000000000
+#define DS_CPU_OP_INDEX_5	900000000
+#define DS_CPU_OP_INDEX_6	800000000
+#define DS_CPU_OP_INDEX_7	700000000
+#define DS_CPU_OP_INDEX_8	600000000
+#define DS_CPU_OP_INDEX_9	500000000
+#define DS_CPU_OP_INDEX_10	400000000
+#define DS_CPU_OP_INDEX_11	300000000
+#define DS_CPU_OP_INDEX_12	200000000
+#define DS_CPU_OP_INDEX_13	100000000
 
 #define DS_CPU_OP_INDEX_MAX		DS_CPU_OP_INDEX_0
-#define DS_CPU_OP_INDEX_MIN		DS_CPU_OP_INDEX_3
+#define DS_CPU_OP_INDEX_MIN		DS_CPU_OP_INDEX_13
 
-#define DS_CPU_OP_INDEX_INI		DS_CPU_OP_INDEX_MAX
+#define DS_CPU_OP_INDEX_INI		DS_CPU_OP_INDEX_4
 
 #define DS_CPU_OP_INDEX_TOUCH40	DS_CPU_OP_INDEX_MIN
 #define DS_CPU_OP_INDEX_TOUCH39	DS_CPU_OP_INDEX_MIN
@@ -131,11 +159,21 @@
  * 0.75 = 0.5 + 0.25	= 0000 0000 0000 0000 0000 1100 0000 0000 = 0x00000c00
  */
 //#define DS_CPU_OP_SF_0	0x1000	// It is not an fraction. It should be 1
-#define DS_CPU_OP_SF_1	0xccc	// 0.8
-#define DS_CPU_OP_SF_2	0x999	// 0.6
-#define DS_CPU_OP_SF_3	0x4cc	// 0.3
+#define DS_CPU_OP_SF_1	0xf68	// 0.962962...
+#define DS_CPU_OP_SF_2	0xe39	// 0.88...
+#define DS_CPU_OP_SF_3	0xd09	// 0.814814...
+#define DS_CPU_OP_SF_4	0xbda	// 0.740740...
+#define DS_CPU_OP_SF_5	0xaab	// 0.66...
+#define DS_CPU_OP_SF_6	0x97b	// 0.592592...
+#define DS_CPU_OP_SF_7	0x84c	// 0.518518...
+#define DS_CPU_OP_SF_8	0x71c	// 0.44...
+#define DS_CPU_OP_SF_9	0x5ed	// 0.370370...
+#define DS_CPU_OP_SF_10	0x4be	// 0.296296...
+#define DS_CPU_OP_SF_11	0x38e	// 0.22...
+#define DS_CPU_OP_SF_12	0x25f	// 0.148148...
+#define DS_CPU_OP_SF_13	0x12f	// 0.074074...
 
-#define DS_CPU_OP_SF_MIN		DS_CPU_OP_SF_3
+#define DS_CPU_OP_SF_MIN		DS_CPU_OP_SF_13
 
 /* For ds_cpu_status.cpu_mode */
 #define DS_CPU_MODE_IDLE		0
@@ -217,7 +255,7 @@
 /* To cope with touch and key inputs */
 #define DS_TOUCH_CPU_OP_UP_CNT_MAX			40		// Fixed.
 #define DS_TOUCH_CPU_OP_UP_INTERVAL			100000	// 100 msec. Don't touch this. LG standard.
-#define DS_CPU_OP_INDEX_CONT_TOUCH			DS_CPU_OP_INDEX_1
+#define DS_CPU_OP_INDEX_CONT_TOUCH			DS_CPU_OP_INDEX_6 // Huexxx: Mantaining 800 MHz...
 #define DS_CONT_TOUCH_THRESHOLD_USEC		150000	// 15 msec by 10.
 #define DS_CONT_TOUCH_CARE_WAIT_SEC			3		// 3 seconds
 
@@ -236,7 +274,7 @@
 #define DS_POST_EARLY_SUSPEND_DELAY_SEC			3		/* 3 seconds */
 
 /* Consideration for the frequency locking through cpufreq sysfs */
-#define DS_CPU_OP_INDEX_LOCKED_MIN				DS_CPU_OP_INDEX_2
+#define DS_CPU_OP_INDEX_LOCKED_MIN				DS_CPU_OP_INDEX_8 // Huexxx: Mantaining 600 MHz...
 #define DS_CPU_OP_LOCK_SUSTAIN_SEC				30
 
 /***************************************************************************

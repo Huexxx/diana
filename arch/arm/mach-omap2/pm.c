@@ -518,7 +518,7 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				} else {
 					vdd1_locked = 0;
 #ifdef CONFIG_LGE_DVFS
-					per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 300000000;
+					per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 100000000;
 #endif	// CONFIG_LGE_DVFS
 					return n;
 				}
@@ -652,21 +652,63 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 #ifdef CONFIG_LGE_DVFS
 				switch(i){
 					case 1:
-						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 300000000;	// Unlocked.
-						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 260000000;
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 100000000;  // Unlocked.
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 90000000;
 						break;
 					case 2:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 200000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 170000000;
+						break;
+					case 3:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 300000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 260000000;
+						break;
+					case 4:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 400000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 350000000;
+						break;
+					case 5:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 500000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 440000000;
+						break;
+					case 6:
 						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 600000000;
 						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 520000000;
 						break;
-					case 3:
+					case 7:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 700000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 590000000;
+						break;
+					case 8:
 						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 800000000;
 						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 660000000;
 						break;
-					case 4:
+					case 9:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 900000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 730000000;
+						break;
+					case 10:
 						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1000000000;
 						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 800000000;
 						break;
+#ifdef CONFIG_P970_OPPS_ENABLED
+					case 11:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1100000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 870000000;
+						break;
+					case 12:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1200000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 930000000;
+						break;
+					case 13:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1300000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 970000000;
+						break;
+					case 14:
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1350000000;
+						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 1000000000;
+						break;
+#endif
 					default:
 						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 1000000000;
 						per_cpu(ds_sys_status, 0).locked_min_iva_freq = 800000000;
