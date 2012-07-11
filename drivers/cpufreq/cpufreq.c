@@ -470,7 +470,10 @@ show_one(scaling_cur_freq, cur);
 static int __cpufreq_set_policy(struct cpufreq_policy *data,
 				struct cpufreq_policy *policy);
 
-#ifdef CONFIG_LGE_DVFS
+
+/**
+ * cpufreq_per_cpu_attr_write() / store_##file_name() - sysfs write access
+ */
 static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char *buf, size_t count)
 {
 	unsigned int ret = -EINVAL;
@@ -487,11 +490,13 @@ static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char 
 	ret = __cpufreq_set_policy(policy, &new_policy);
 	policy->user_policy.min = policy->min;
 
+#ifdef CONFIG_LGE_DVFS
 	//printk(KERN_WARNING "store_scaling_min_freq(): To %u\n", policy->min);
 	if(ds_control.on_dvs == 1)
 	{
-		per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = policy->min;
+		per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = (policy->min)*1000;
 	}
+#endif	// CONFIG_LGE_DVFS
 
 	return ret ? ret : count;
 }
@@ -512,42 +517,17 @@ static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char 
 	ret = __cpufreq_set_policy(policy, &new_policy);
 	policy->user_policy.max = policy->max;
 
+#ifdef CONFIG_LGE_DVFS
 	//printk(KERN_WARNING "store_scaling_max_freq(): To %u\n", policy->max);
 	if(ds_control.on_dvs == 1)
 	{
-		per_cpu(ds_sys_status, 0).locked_max_cpu_op_index = policy->max;
+		per_cpu(ds_sys_status, 0).locked_max_cpu_op_index = (policy->max)*1000;
 	}
+#endif	// CONFIG_LGE_DVFS
 
 	return ret ? ret : count;
 }
-#else	// CONFIG_LGE_DVFS
-/**
- * cpufreq_per_cpu_attr_write() / store_##file_name() - sysfs write access
- */
-#define store_one(file_name, object)			\
-static ssize_t store_##file_name					\
-(struct cpufreq_policy *policy, const char *buf, size_t count)		\
-{									\
-	unsigned int ret = -EINVAL;					\
-	struct cpufreq_policy new_policy;				\
-									\
-	ret = cpufreq_get_policy(&new_policy, policy->cpu);		\
-	if (ret)							\
-		return -EINVAL;						\
-									\
-	ret = sscanf(buf, "%u", &new_policy.object);			\
-	if (ret != 1)							\
-		return -EINVAL;						\
-									\
-	ret = __cpufreq_set_policy(policy, &new_policy);		\
-	policy->user_policy.object = policy->object;			\
-									\
-	return ret ? ret : count;					\
-}
 
-store_one(scaling_min_freq, min);
-store_one(scaling_max_freq, max);
-#endif	// CONFIG_LGE_DVFS
 
 /**
  * show_cpuinfo_cur_freq - current CPU frequency as detected by hardware
