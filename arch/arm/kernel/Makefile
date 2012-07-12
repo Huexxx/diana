@@ -15,7 +15,11 @@ CFLAGS_REMOVE_return_address.o = -pg
 
 obj-y		:= compat.o elf.o entry-armv.o entry-common.o irq.o \
 		   process.o ptrace.o return_address.o setup.o signal.o \
-		   sys_arm.o stacktrace.o time.o traps.o dvs_suite.o # sookyoung.kim@lge.com LG-DVFS
+		   sys_arm.o stacktrace.o time.o traps.o 
+
+ifdef CONFIG_LGE_DVFS
+obj-y				+= dvs_suite.o
+endif
 
 obj-$(CONFIG_LEDS)		+= leds.o
 obj-$(CONFIG_OC_ETM)		+= etm.o
