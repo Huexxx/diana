@@ -518,7 +518,8 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				} else {
 					vdd1_locked = 0;
 #ifdef CONFIG_LGE_DVFS
-					per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 100000000;
+					per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = 
+						per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index;
 #endif	// CONFIG_LGE_DVFS
 					return n;
 				}

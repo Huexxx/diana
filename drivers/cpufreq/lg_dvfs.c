@@ -1833,6 +1833,7 @@ int ds_initialize_ds_control(void){
 
 int ds_initialize_ds_sys_status(void){
 
+	per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index = DS_CPU_OP_INDEX_13;
 	per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = DS_CPU_OP_INDEX_13;
 	per_cpu(ds_sys_status, 0).locked_min_cpu_op_release_sec = 0;
 	per_cpu(ds_sys_status, 0).flag_locked_min_cpu_op = 0;

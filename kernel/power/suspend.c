@@ -32,6 +32,10 @@
 
 #include "power.h"
 
+#ifdef CONFIG_LGE_DVFS
+#include <linux/dvs_suite.h>
+#endif	// CONFIG_LGE_DVFS
+
 const char *const pm_states[PM_SUSPEND_MAX] = {
 #ifdef CONFIG_EARLYSUSPEND
 	[PM_SUSPEND_ON]		= "on",
@@ -242,13 +246,19 @@ int suspend_devices_and_enter(suspend_state_t state)
 	if (suspend_test(TEST_DEVICES))
 		goto Recover_platform;
 
-#ifndef CONFIG_LGE_DVFS
-	omap_pm_set_min_bus_tput(&l3_dev, OCP_INITIATOR_AGENT, 100 * 1000 * 4);
-#endif	// CONFIG_LGE_DVFS
-
+#ifdef CONFIG_LGE_DVFS
+	if(ds_control.flag_run_dvs != 1)
+	{
+		omap_pm_set_min_bus_tput(&l3_dev, OCP_INITIATOR_AGENT, 100 * 1000 * 4);
+	}
 	suspend_enter(state);
-
-#ifndef CONFIG_LGE_DVFS
+	if(ds_control.flag_run_dvs != 1)
+	{
+		omap_pm_set_min_bus_tput(&l3_dev, OCP_INITIATOR_AGENT, 200 * 1000 * 4);
+	}
+#else
+	omap_pm_set_min_bus_tput(&l3_dev, OCP_INITIATOR_AGENT, 100 * 1000 * 4);
+	suspend_enter(state);
 	omap_pm_set_min_bus_tput(&l3_dev, OCP_INITIATOR_AGENT, 200 * 1000 * 4);
 #endif	// CONFIG_LGE_DVFS
 	

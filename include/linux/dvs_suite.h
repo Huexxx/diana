@@ -319,6 +319,7 @@ struct dvs_suite_system_status {
 	int type[DS_PID_LIMIT];
 	char tg_owner_comm[DS_PID_LIMIT][16];
 
+	unsigned int sysfs_min_cpu_op_index;
 	unsigned int locked_min_cpu_op_index;
 	unsigned long locked_min_cpu_op_release_sec;
 	int flag_locked_min_cpu_op;

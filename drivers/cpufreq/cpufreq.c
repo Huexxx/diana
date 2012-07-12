@@ -49,9 +49,8 @@ static DEFINE_PER_CPU(char[CPUFREQ_NAME_LEN], cpufreq_cpu_governor);
 #endif
 static DEFINE_SPINLOCK(cpufreq_driver_lock);
 
-#ifdef CONFIG_LGE_DVFS
 static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char *buf, size_t count);
-#endif	// CONFIG_LGE_DVFS
+static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char *buf, size_t count);
 
 /*
  * cpu_policy_rwsem is a per CPU reader-writer semaphore designed to cure
@@ -495,6 +494,7 @@ static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char 
 	if(ds_control.on_dvs == 1)
 	{
 		per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = (policy->min)*1000;
+		per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index = (policy->min)*1000;
 	}
 #endif	// CONFIG_LGE_DVFS
 
