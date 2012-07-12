@@ -1004,337 +1004,159 @@ unsigned long perf_requirement_int_ulong,
 unsigned long perf_requirement_fra_fp12)
 {
 
+	/* Ensure to take only the last 12 bits */
+	perf_requirement_fra_fp12 = perf_requirement_fra_fp12 & 0xfff;
+
 	/* If perf_requirement_int_ulong > 0,
 		 which means that the required performance is greater than 1,
 		 apply the maximum CPU_OP. */
 	if(perf_requirement_int_ulong > 0){
-		return(DS_CPU_OP_INDEX_MAX);
+		return(per_cpu(ds_sys_status, 0).locked_max_cpu_op_index);
 	}
 	else{
-		switch(perf_requirement_fra_fp12 & 0xf00){
-			case 0xf00: goto LC_LT_0XF00;	/* > 0.9375 and < 1 */
-			case 0xe00: goto LC_LT_0XE00;	/* > 0.875 and < 0.9375 */
-			case 0xd00: goto LC_LT_0XD00;	/* > 0.8125 and < 0.875 */
-			case 0xc00: goto LC_LT_0XC00;	/* > 0.75 and < 0.8125 */
-			case 0xb00: goto LC_LT_0XB00;	/* > 0.6875 and < 0.75 */
-			case 0xa00: goto LC_LT_0XA00;	/* > 0.625 and < 0.6875 */
-			case 0x900: goto LC_LT_0X900;	/* > 0.5625 and < 0.625 */
-			case 0x800: goto LC_LT_0X800;	/* > 0.5 and < 0.5625 */
-			case 0x700: goto LC_LT_0X700;	/* > 0.4375 and < 0.5 */
-			case 0x600: goto LC_LT_0X600;	/* > 0.375 and < 0.4375 */
-			case 0x500: goto LC_LT_0X500;	/* > 0.3125 and < 0.375 */
-			case 0x400: goto LC_LT_0X400;	/* > 0.25 and < 0.3125 */
-			case 0x300: goto LC_LT_0X300;	/* > 0.1875 and < 0.25 */
-			case 0x200: goto LC_LT_0X200;	/* > 0.125 and < 0.1875 */
-			case 0x100: goto LC_LT_0X100;	/* > 0.0625 and < 0.125 */
-			default: goto LC_LT_0X000;	/* < 0.0625 */
+		switch(per_cpu(ds_sys_status, 0).locked_max_cpu_op_index){
+			case 1350000000: 	goto OPP_13;
+			case 1300000000: 	goto OPP_12;
+			case 1200000000: 	goto OPP_11;
+			case 1100000000: 	goto OPP_10;
+			case 1000000000: 	goto OPP_9;
+			case 900000000: 	goto OPP_8;
+			case 800000000: 	goto OPP_7;
+			case 700000000: 	goto OPP_6;
+			case 600000000: 	goto OPP_5;
+			case 500000000: 	goto OPP_4;
+			case 400000000: 	goto OPP_3;
+			case 300000000: 	goto OPP_2;
+			default:		goto OPP_9;
 		}
 	}
 
-LC_LT_0XF00:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9961 and < 1 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9922 and < 0.9961 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9883 and < 0.9922 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9844 and < 0.9883 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9805 and < 0.9844 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9766 and < 0.9805 */
-		case 0x090: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9727 and < 0.9766 */
-		case 0x080: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9688 and < 0.9727 */
-		case 0x070: return(DS_CPU_OP_INDEX_MAX);	/* > 0.9648 and < 0.9688 */
-		case 0x060: return(DS_CPU_OP_INDEX_1);	/* > 0.9609 and < 0.9648 */
-		case 0x050: return(DS_CPU_OP_INDEX_1);	/* > 0.9570 and < 0.9609 */
-		case 0x040: return(DS_CPU_OP_INDEX_1);	/* > 0.9531 and < 0.9570 */
-		case 0x030: return(DS_CPU_OP_INDEX_1);	/* > 0.9492 and < 0.9531 */
-		case 0x020: return(DS_CPU_OP_INDEX_1);	/* > 0.9453 and < 0.9492 */
-		case 0x010: return(DS_CPU_OP_INDEX_1);	/* > 0.9414 and < 0.9453 */
-		default: return(DS_CPU_OP_INDEX_1);	/* > 0.9375 and < 0.9414 */
-	}
-LC_LT_0XE00:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_1);	/* > 0.9336 and < 0.9375 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_1);	/* > 0.9297 and < 0.9336 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_1);	/* > 0.9258 and < 0.9297 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_1);	/* > 0.9219 and < 0.9258 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_1);	/* > 0.9180 and < 0.9219 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_1);	/* > 0.9141 and < 0.9180 */
-		case 0x090: return(DS_CPU_OP_INDEX_1);	/* > 0.9102 and < 0.9141 */
-		case 0x080: return(DS_CPU_OP_INDEX_1);	/* > 0.9063 and < 0.9102 */
-		case 0x070: return(DS_CPU_OP_INDEX_1);	/* > 0.9023 and < 0.9063 */
-		case 0x060: return(DS_CPU_OP_INDEX_1);	/* > 0.8984 and < 0.9023 */
-		case 0x050: return(DS_CPU_OP_INDEX_1);	/* > 0.8945 and < 0.8984 */
-		case 0x040: return(DS_CPU_OP_INDEX_1);	/* > 0.8906 and < 0.8945 */
-		case 0x030: return(DS_CPU_OP_INDEX_2);	/* > 0.8867 and < 0.8906 */
-		case 0x020: return(DS_CPU_OP_INDEX_2);	/* > 0.8828 and < 0.8867 */
-		case 0x010: return(DS_CPU_OP_INDEX_2);	/* > 0.8789 and < 0.8828 */
-		default: return(DS_CPU_OP_INDEX_2);	/* > 0.8750 and < 0.8789 */
-	}
-LC_LT_0XD00:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_2);	/* > 0.8711 and < 0.8750 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_2);	/* > 0.8672 and < 0.8711 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_2);	/* > 0.8633 and < 0.8672 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_2);	/* > 0.8594 and < 0.8633 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_2);	/* > 0.8555 and < 0.8594 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_2);	/* > 0.8516 and < 0.8555 */
-		case 0x090: return(DS_CPU_OP_INDEX_2);	/* > 0.8477 and < 0.8516 */
-		case 0x080: return(DS_CPU_OP_INDEX_2);	/* > 0.8438 and < 0.8477 */
-		case 0x070: return(DS_CPU_OP_INDEX_2);	/* > 0.8398 and < 0.8438 */
-		case 0x060: return(DS_CPU_OP_INDEX_2);	/* > 0.8359 and < 0.8398 */
-		case 0x050: return(DS_CPU_OP_INDEX_2);	/* > 0.8320 and < 0.8359 */
-		case 0x040: return(DS_CPU_OP_INDEX_2);	/* > 0.8281 and < 0.8320 */
-		case 0x030: return(DS_CPU_OP_INDEX_2);	/* > 0.8242 and < 0.8281 */
-		case 0x020: return(DS_CPU_OP_INDEX_2);	/* > 0.8203 and < 0.8242 */
-		case 0x010: return(DS_CPU_OP_INDEX_2);	/* > 0.8164 and < 0.8203 */
-		default: return(DS_CPU_OP_INDEX_3);	/* > 0.8125 and < 0.8164 */
-	}
-LC_LT_0XC00:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_3);	/* > 0.8086 and < 0.8125 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_3);	/* > 0.8047 and < 0.8086 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_3);	/* > 0.8008 and < 0.8047 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_3);	/* > 0.7969 and < 0.8008 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_3);	/* > 0.7930 and < 0.7969 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_3);	/* > 0.7891 and < 0.7930 */
-		case 0x090: return(DS_CPU_OP_INDEX_3);	/* > 0.7852 and < 0.7891 */
-		case 0x080: return(DS_CPU_OP_INDEX_3);	/* > 0.7813 and < 0.7852 */
-		case 0x070: return(DS_CPU_OP_INDEX_3);	/* > 0.7773 and < 0.7813 */
-		case 0x060: return(DS_CPU_OP_INDEX_3);	/* > 0.7734 and < 0.7773 */
-		case 0x050: return(DS_CPU_OP_INDEX_3);	/* > 0.7695 and < 0.7734 */
-		case 0x040: return(DS_CPU_OP_INDEX_3);	/* > 0.7656 and < 0.7695 */
-		case 0x030: return(DS_CPU_OP_INDEX_3);	/* > 0.7617 and < 0.7656 */
-		case 0x020: return(DS_CPU_OP_INDEX_3);	/* > 0.7578 and < 0.7617 */
-		case 0x010: return(DS_CPU_OP_INDEX_3);	/* > 0.7539 and < 0.7578 */
-		default: return(DS_CPU_OP_INDEX_3);	/* > 0.7500 and < 0.7539 */
-	}
-LC_LT_0XB00:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_3);	/* > 0.7461 and < 0.7500 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_3);	/* > 0.7422 and < 0.7461 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_4);	/* > 0.7383 and < 0.7422 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_4);	/* > 0.7344 and < 0.7383 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_4);	/* > 0.7305 and < 0.7344 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_4);	/* > 0.7266 and < 0.7305 */
-		case 0x090: return(DS_CPU_OP_INDEX_4);	/* > 0.7227 and < 0.7266 */
-		case 0x080: return(DS_CPU_OP_INDEX_4);	/* > 0.7188 and < 0.7227 */
-		case 0x070: return(DS_CPU_OP_INDEX_4);	/* > 0.7148 and < 0.7188 */
-		case 0x060: return(DS_CPU_OP_INDEX_4);	/* > 0.7109 and < 0.7148 */
-		case 0x050: return(DS_CPU_OP_INDEX_4);	/* > 0.7070 and < 0.7109 */
-		case 0x040: return(DS_CPU_OP_INDEX_4);	/* > 0.7031 and < 0.7070 */
-		case 0x030: return(DS_CPU_OP_INDEX_4);	/* > 0.6992 and < 0.7031 */
-		case 0x020: return(DS_CPU_OP_INDEX_4);	/* > 0.6953 and < 0.6992 */
-		case 0x010: return(DS_CPU_OP_INDEX_4);	/* > 0.6914 and < 0.6953 */
-		default: return(DS_CPU_OP_INDEX_4);	/* > 0.6875 and < 0.6914 */
-	}
-LC_LT_0XA00:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_4);	/* > 0.6836 and < 0.6875 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_4);	/* > 0.6797 and < 0.6836 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_4);	/* > 0.6758 and < 0.6797 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_4);	/* > 0.6719 and < 0.6758 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_4);	/* > 0.6680 and < 0.6719 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_5);	/* > 0.6641 and < 0.6680 */
-		case 0x090: return(DS_CPU_OP_INDEX_5);	/* > 0.6602 and < 0.6641 */
-		case 0x080: return(DS_CPU_OP_INDEX_5);	/* > 0.6563 and < 0.6602 */
-		case 0x070: return(DS_CPU_OP_INDEX_5);	/* > 0.6523 and < 0.6563 */
-		case 0x060: return(DS_CPU_OP_INDEX_5);	/* > 0.6484 and < 0.6523 */
-		case 0x050: return(DS_CPU_OP_INDEX_5);	/* > 0.6445 and < 0.6484 */
-		case 0x040: return(DS_CPU_OP_INDEX_5);	/* > 0.6406 and < 0.6445 */
-		case 0x030: return(DS_CPU_OP_INDEX_5);	/* > 0.6367 and < 0.6406 */
-		case 0x020: return(DS_CPU_OP_INDEX_5);	/* > 0.6328 and < 0.6367 */
-		case 0x010: return(DS_CPU_OP_INDEX_5);	/* > 0.6289 and < 0.6328 */
-		default: return(DS_CPU_OP_INDEX_5);	/* > 0.6250 and < 0.6289 */
-	}
-LC_LT_0X900:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_5);	/* > 0.6211 and < 0.6250 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_5);	/* > 0.6172 and < 0.6211 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_5);	/* > 0.6133 and < 0.6172 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_5);	/* > 0.6093 and < 0.6133 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_5);	/* > 0.6055 and < 0.6093 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_5);	/* > 0.6016 and < 0.6055 */
-		case 0x090: return(DS_CPU_OP_INDEX_5);	/* > 0.5977 and < 0.6016 */
-		case 0x080: return(DS_CPU_OP_INDEX_5);	/* > 0.5938 and < 0.5977 */
-		case 0x070: return(DS_CPU_OP_INDEX_6);	/* > 0.5898 and < 0.5938 */
-		case 0x060: return(DS_CPU_OP_INDEX_6);	/* > 0.5859 and < 0.5898 */
-		case 0x050: return(DS_CPU_OP_INDEX_6);	/* > 0.5820 and < 0.5859 */
-		case 0x040: return(DS_CPU_OP_INDEX_6);	/* > 0.5781 and < 0.5820 */
-		case 0x030: return(DS_CPU_OP_INDEX_6);	/* > 0.5742 and < 0.5781 */
-		case 0x020: return(DS_CPU_OP_INDEX_6);	/* > 0.5703 and < 0.5742 */
-		case 0x010: return(DS_CPU_OP_INDEX_6);	/* > 0.5664 and < 0.5703 */
-		default: return(DS_CPU_OP_INDEX_6);	/* > 0.5625 and < 0.5664 */
-	}
-LC_LT_0X800:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_6);	/* > 0.5586 and < 0.5625 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_6);	/* > 0.5547 and < 0.5586 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_6);	/* > 0.5508 and < 0.5547 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_6);	/* > 0.5469 and < 0.5508 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_6);	/* > 0.5430 and < 0.5469 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_6);	/* > 0.5391 and < 0.5430 */
-		case 0x090: return(DS_CPU_OP_INDEX_6);	/* > 0.5352 and < 0.5391 */
-		case 0x080: return(DS_CPU_OP_INDEX_6);	/* > 0.5313 and < 0.5352 */
-		case 0x070: return(DS_CPU_OP_INDEX_6);	/* > 0.5273 and < 0.5313 */
-		case 0x060: return(DS_CPU_OP_INDEX_6);	/* > 0.5234 and < 0.5273 */
-		case 0x050: return(DS_CPU_OP_INDEX_6);	/* > 0.5195 and < 0.5234 */
-		case 0x040: return(DS_CPU_OP_INDEX_7);	/* > 0.5156 and < 0.5195 */
-		case 0x030: return(DS_CPU_OP_INDEX_7);	/* > 0.5117 and < 0.5156 */
-		case 0x020: return(DS_CPU_OP_INDEX_7);	/* > 0.5078 and < 0.5117 */
-		case 0x010: return(DS_CPU_OP_INDEX_7);	/* > 0.5039 and < 0.5078 */
-		default: return(DS_CPU_OP_INDEX_7);	/* > 0.5000 and < 0.5039 */
-	}
-LC_LT_0X700:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_7);	/* > 0.4961 and < 0.5000 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_7);	/* > 0.4922 and < 0.4961 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_7);	/* > 0.4883 and < 0.4922 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_7);	/* > 0.4844 and < 0.4883 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_7);	/* > 0.4805 and < 0.4844 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_7);	/* > 0.4766 and < 0.4805 */
-		case 0x090: return(DS_CPU_OP_INDEX_7);	/* > 0.4727 and < 0.4766 */
-		case 0x080: return(DS_CPU_OP_INDEX_7);	/* > 0.4688 and < 0.4727 */
-		case 0x070: return(DS_CPU_OP_INDEX_7);	/* > 0.4648 and < 0.4688 */
-		case 0x060: return(DS_CPU_OP_INDEX_7);	/* > 0.4609 and < 0.4648 */
-		case 0x050: return(DS_CPU_OP_INDEX_7);	/* > 0.4570 and < 0.4609 */
-		case 0x040: return(DS_CPU_OP_INDEX_7);	/* > 0.4531 and < 0.4570 */
-		case 0x030: return(DS_CPU_OP_INDEX_7);	/* > 0.4492 and < 0.4531 */
-		case 0x020: return(DS_CPU_OP_INDEX_7);	/* > 0.4453 and < 0.4492 */
-		case 0x010: return(DS_CPU_OP_INDEX_8);	/* > 0.4414 and < 0.4453 */
-		default: return(DS_CPU_OP_INDEX_8);	/* > 0.4375 and < 0.4414 */
-	}
-LC_LT_0X600:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_8);	/* > 0.4336 and < 0.4375 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_8);	/* > 0.4297 and < 0.4336 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_8);	/* > 0.4258 and < 0.4297 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_8);	/* > 0.4219 and < 0.4258 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_8);	/* > 0.4180 and < 0.4219 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_8);	/* > 0.4141 and < 0.4180 */
-		case 0x090: return(DS_CPU_OP_INDEX_8);	/* > 0.4102 and < 0.4141 */
-		case 0x080: return(DS_CPU_OP_INDEX_8);	/* > 0.4063 and < 0.4102 */
-		case 0x070: return(DS_CPU_OP_INDEX_8);	/* > 0.4023 and < 0.4063 */
-		case 0x060: return(DS_CPU_OP_INDEX_8);	/* > 0.3984 and < 0.4023 */
-		case 0x050: return(DS_CPU_OP_INDEX_8);	/* > 0.3945 and < 0.3984 */
-		case 0x040: return(DS_CPU_OP_INDEX_8);	/* > 0.3906 and < 0.3945 */
-		case 0x030: return(DS_CPU_OP_INDEX_8);	/* > 0.3867 and < 0.3906 */
-		case 0x020: return(DS_CPU_OP_INDEX_8);	/* > 0.3828 and < 0.3867 */
-		case 0x010: return(DS_CPU_OP_INDEX_8);	/* > 0.3789 and < 0.3828 */
-		default: return(DS_CPU_OP_INDEX_8);	/* > 0.3750 and < 0.3789 */
-	}
-LC_LT_0X500:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_8);	/* > 0.3711 and < 0.3750 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_9);	/* > 0.3672 and < 0.3711 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_9);	/* > 0.3633 and < 0.3672 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_9);	/* > 0.3594 and < 0.3633 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_9);	/* > 0.3555 and < 0.3594 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_9);	/* > 0.3516 and < 0.3555 */
-		case 0x090: return(DS_CPU_OP_INDEX_9);	/* > 0.3477 and < 0.3516 */
-		case 0x080: return(DS_CPU_OP_INDEX_9);	/* > 0.3438 and < 0.3477 */
-		case 0x070: return(DS_CPU_OP_INDEX_9);	/* > 0.3398 and < 0.3438 */
-		case 0x060: return(DS_CPU_OP_INDEX_9);	/* > 0.3359 and < 0.3398 */
-		case 0x050: return(DS_CPU_OP_INDEX_9);	/* > 0.3320 and < 0.3359 */
-		case 0x040: return(DS_CPU_OP_INDEX_9);	/* > 0.3281 and < 0.3320 */
-		case 0x030: return(DS_CPU_OP_INDEX_9);	/* > 0.3242 and < 0.3281 */
-		case 0x020: return(DS_CPU_OP_INDEX_9);	/* > 0.3203 and < 0.3242 */
-		case 0x010: return(DS_CPU_OP_INDEX_9);	/* > 0.3164 and < 0.3203 */
-		default: return(DS_CPU_OP_INDEX_9);	/* > 0.3125 and < 0.3164 */
-	}
-LC_LT_0X400:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_9);	/* > 0.3086 and < 0.3125 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_9);	/* > 0.3047 and < 0.3086 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_9);	/* > 0.3008 and < 0.3047 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_9);	/* > 0.2969 and < 0.3008 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_10);	/* > 0.2930 and < 0.2969 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_10);	/* > 0.2891 and < 0.2930 */
-		case 0x090: return(DS_CPU_OP_INDEX_10);	/* > 0.2852 and < 0.2891 */
-		case 0x080: return(DS_CPU_OP_INDEX_10);	/* > 0.2813 and < 0.2852 */
-		case 0x070: return(DS_CPU_OP_INDEX_10);	/* > 0.2773 and < 0.2813 */
-		case 0x060: return(DS_CPU_OP_INDEX_10);	/* > 0.2734 and < 0.2773 */
-		case 0x050: return(DS_CPU_OP_INDEX_10);	/* > 0.2695 and < 0.2734 */
-		case 0x040: return(DS_CPU_OP_INDEX_10);	/* > 0.2656 and < 0.2695 */
-		case 0x030: return(DS_CPU_OP_INDEX_10);	/* > 0.2617 and < 0.2656 */
-		case 0x020: return(DS_CPU_OP_INDEX_10);	/* > 0.2578 and < 0.2617 */
-		case 0x010: return(DS_CPU_OP_INDEX_10);	/* > 0.2539 and < 0.2578 */
-		default: return(DS_CPU_OP_INDEX_10);	/* > 0.2500 and < 0.2539 */
-	}
-LC_LT_0X300:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_10);	/* > 0.2461 and < 0.2500 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_10);	/* > 0.2422 and < 0.2461 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_10);	/* > 0.2383 and < 0.2422 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_10);	/* > 0.2344 and < 0.2383 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_10);	/* > 0.2305 and < 0.2344 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_10);	/* > 0.2266 and < 0.2305 */
-		case 0x090: return(DS_CPU_OP_INDEX_10);	/* > 0.2227 and < 0.2266 */
-		case 0x080: return(DS_CPU_OP_INDEX_11);	/* > 0.2188 and < 0.2227 */
-		case 0x070: return(DS_CPU_OP_INDEX_11);	/* > 0.2148 and < 0.2188 */
-		case 0x060: return(DS_CPU_OP_INDEX_11);	/* > 0.2109 and < 0.2148 */
-		case 0x050: return(DS_CPU_OP_INDEX_11);	/* > 0.2070 and < 0.2109 */
-		case 0x040: return(DS_CPU_OP_INDEX_11);	/* > 0.2031 and < 0.2070 */
-		case 0x030: return(DS_CPU_OP_INDEX_11);	/* > 0.1992 and < 0.2031 */
-		case 0x020: return(DS_CPU_OP_INDEX_11);	/* > 0.1953 and < 0.1992 */
-		case 0x010: return(DS_CPU_OP_INDEX_11);	/* > 0.1914 and < 0.1953 */
-		default: return(DS_CPU_OP_INDEX_11);	/* > 0.1875 and < 0.1914 */
-	}
-LC_LT_0X200:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_11);	/* > 0.1836 and < 0.1875 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_11);	/* > 0.1797 and < 0.1836 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_11);	/* > 0.1758 and < 0.1797 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_11);	/* > 0.1719 and < 0.1758 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_11);	/* > 0.1680 and < 0.1719 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_11);	/* > 0.1641 and < 0.1680 */
-		case 0x090: return(DS_CPU_OP_INDEX_11);	/* > 0.1602 and < 0.1641 */
-		case 0x080: return(DS_CPU_OP_INDEX_11);	/* > 0.1563 and < 0.1602 */
-		case 0x070: return(DS_CPU_OP_INDEX_11);	/* > 0.1523 and < 0.1563 */
-		case 0x060: return(DS_CPU_OP_INDEX_11);	/* > 0.1484 and < 0.1523 */
-		case 0x050: return(DS_CPU_OP_INDEX_12);	/* > 0.1445 and < 0.1484 */
-		case 0x040: return(DS_CPU_OP_INDEX_12);	/* > 0.1406 and < 0.1445 */
-		case 0x030: return(DS_CPU_OP_INDEX_12);	/* > 0.1367 and < 0.1406 */
-		case 0x020: return(DS_CPU_OP_INDEX_12);	/* > 0.1328 and < 0.1367 */
-		case 0x010: return(DS_CPU_OP_INDEX_12);	/* > 0.1289 and < 0.1328 */
-		default: return(DS_CPU_OP_INDEX_12);	/* > 0.1250 and < 0.1289 */
-	}
-LC_LT_0X100:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_12);	/* > 0.1211 and < 0.1250 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_12);	/* > 0.1172 and < 0.1211 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_12);	/* > 0.1133 and < 0.1172 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_12);	/* > 0.1094 and < 0.1133 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_12);	/* > 0.1055 and < 0.1094 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_12);	/* > 0.1016 and < 0.1055 */
-		case 0x090: return(DS_CPU_OP_INDEX_12);	/* > 0.0977 and < 0.1016 */
-		case 0x080: return(DS_CPU_OP_INDEX_12);	/* > 0.0938 and < 0.0977 */
-		case 0x070: return(DS_CPU_OP_INDEX_12);	/* > 0.0898 and < 0.0938 */
-		case 0x060: return(DS_CPU_OP_INDEX_12);	/* > 0.0859 and < 0.0898 */
-		case 0x050: return(DS_CPU_OP_INDEX_12);	/* > 0.0820 and < 0.0859 */
-		case 0x040: return(DS_CPU_OP_INDEX_12);	/* > 0.0781 and < 0.0820 */
-		case 0x030: return(DS_CPU_OP_INDEX_12);	/* > 0.0742 and < 0.0781 */
-		case 0x020: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0703 and < 0.0742 */
-		case 0x010: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0664 and < 0.0703 */
-		default: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0625 and < 0.0664 */
-	}
-LC_LT_0X000:
-	switch(perf_requirement_fra_fp12 & 0x0f0){
-		case 0x0f0: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0586 and < 0.0625 */
-		case 0x0e0: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0547 and < 0.0586 */
-		case 0x0d0: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0508 and < 0.0547 */
-		case 0x0c0: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0469 and < 0.0508 */
-		case 0x0b0: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0430 and < 0.0469 */
-		case 0x0a0: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0391 and < 0.0430 */
-		case 0x090: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0352 and < 0.0391 */
-		case 0x080: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0313 and < 0.0352 */
-		case 0x070: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0273 and < 0.0313 */
-		case 0x060: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0234 and < 0.0273 */
-		case 0x050: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0195 and < 0.0234 */
-		case 0x040: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0156 and < 0.0195 */
-		case 0x030: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0117 and < 0.0156 */
-		case 0x020: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0078 and < 0.0117 */
-		case 0x010: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0039 and < 0.0078 */
-		default: return(DS_CPU_OP_INDEX_MIN);	/* > 0.0000 and < 0.0039 */
-	}
+OPP_13:
+	if (perf_requirement_fra_fp12 > 3945) return(DS_CPU_OP_INDEX_0);
+	else if (perf_requirement_fra_fp12 > 3641) return(DS_CPU_OP_INDEX_1);
+	else if (perf_requirement_fra_fp12 > 3338) return(DS_CPU_OP_INDEX_2);
+	else if (perf_requirement_fra_fp12 > 3035) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 2731) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 2428) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2124) return(DS_CPU_OP_INDEX_6);
+	else if (perf_requirement_fra_fp12 > 1821) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 1518) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 1214) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 911) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 607) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 304) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_12:
+	if (perf_requirement_fra_fp12 > 3781) return(DS_CPU_OP_INDEX_1);
+	else if (perf_requirement_fra_fp12 > 3466) return(DS_CPU_OP_INDEX_2);
+	else if (perf_requirement_fra_fp12 > 3151) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 2836) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 2521) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2206) return(DS_CPU_OP_INDEX_6);
+	else if (perf_requirement_fra_fp12 > 1891) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 1576) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 1261) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 946) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 631) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 316) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_11:
+	if (perf_requirement_fra_fp12 > 3755) return(DS_CPU_OP_INDEX_2);
+	else if (perf_requirement_fra_fp12 > 3414) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 3072) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 2731) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2390) return(DS_CPU_OP_INDEX_6);
+	else if (perf_requirement_fra_fp12 > 2048) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 1707) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 1366) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 1024) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 683) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 342) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_10:
+	if (perf_requirement_fra_fp12 > 3724) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 3352) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 2979) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2607) return(DS_CPU_OP_INDEX_6);
+	else if (perf_requirement_fra_fp12 > 2235) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 1862) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 1490) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 1118) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 745) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 373) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_9:
+	if (perf_requirement_fra_fp12 > 3687) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 3277) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2868) return(DS_CPU_OP_INDEX_6);
+	else if (perf_requirement_fra_fp12 > 2458) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 2048) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 1639) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 1229) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 820) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 410) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_8:
+	if (perf_requirement_fra_fp12 > 3641) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 3186) return(DS_CPU_OP_INDEX_6);
+	else if (perf_requirement_fra_fp12 > 2731) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 2276) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 1821) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 1366) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 911) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 456) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_7:
+	if (perf_requirement_fra_fp12 > 3584) return(DS_CPU_OP_INDEX_6);
+	else if (perf_requirement_fra_fp12 > 3072) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 2560) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 2048) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 1536) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 1024) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 512) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_6:
+	if (perf_requirement_fra_fp12 > 3511) return(DS_CPU_OP_INDEX_7);
+	else if (perf_requirement_fra_fp12 > 2926) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 2341) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 1756) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 1171) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 586) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_5:
+	if (perf_requirement_fra_fp12 > 3414) return(DS_CPU_OP_INDEX_8);
+	else if (perf_requirement_fra_fp12 > 2731) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 2048) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 1366) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 683) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_4:
+	if (perf_requirement_fra_fp12 > 3277) return(DS_CPU_OP_INDEX_9);
+	else if (perf_requirement_fra_fp12 > 2458) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 1639) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 820) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_3:
+	if (perf_requirement_fra_fp12 > 3072) return(DS_CPU_OP_INDEX_10);
+	else if (perf_requirement_fra_fp12 > 2048) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 1024) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
+OPP_2:
+	if (perf_requirement_fra_fp12 > 2731) return(DS_CPU_OP_INDEX_11);
+	else if (perf_requirement_fra_fp12 > 1366) return(DS_CPU_OP_INDEX_12);
+	else return(DS_CPU_OP_INDEX_13);
+
 }
 
 /*====================================================================
@@ -1543,6 +1365,7 @@ int ds_do_dvs_aidvs(int ds_cpu, unsigned int *target_cpu_op_index, DS_AIDVS_STAT
 		/* Find the CPU_OP_INDEX corresponding to the calculated utilization */
 		stat->cpu_op_index = 
 			ds_get_next_high_cpu_op_index(stat->moving_avg_int_ulong, stat->moving_avg_fra_fp12);
+#if 0
 		/* TODO: Tune for OMAP */
 		if(ds_cpu){
 			switch(stat->cpu_op_index){
@@ -1563,6 +1386,7 @@ int ds_do_dvs_aidvs(int ds_cpu, unsigned int *target_cpu_op_index, DS_AIDVS_STAT
 				default:			stat->cpu_op_index = DS_CPU_OP_INDEX_0; break;
 			}
 		}
+#endif
 
 		stat->time_usec_interval = 0;
 		stat->time_usec_work = 0;
@@ -1581,9 +1405,11 @@ int ds_do_dvs_aidvs(int ds_cpu, unsigned int *target_cpu_op_index, DS_AIDVS_STAT
 	====================================================================*/
 int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 
-	unsigned int lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_MIN;
-	unsigned int lc_target_cpu_op_index_aidvs = DS_CPU_OP_INDEX_MIN;
-	unsigned int lc_target_cpu_op_index_touch = DS_CPU_OP_INDEX_MIN;
+	unsigned int lc_target_cpu_op_index_lower = min(per_cpu(ds_sys_status, 0).locked_min_cpu_op_index,
+						        per_cpu(ds_sys_status, 0).locked_max_cpu_op_index);
+	unsigned int lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
+	unsigned int lc_target_cpu_op_index_aidvs = lc_target_cpu_op_index_lower;
+//	unsigned int lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
 
 	/* Calc target_cpu_op based on workload */
 	ds_do_dvs_aidvs(ds_cpu, &lc_target_cpu_op_index_aidvs, &(per_cpu(ds_aidvs_status, ds_cpu)));
@@ -1593,6 +1419,9 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 	/* LCD is on (i.e., before early suspend) */
 	if(per_cpu(ds_sys_status, 0).flag_do_post_early_suspend == 0){
 
+#if 0
+		/* Huexxx: Since all TOUCH OPPs are min_freq, there's no reason to mantain this stuff
+		 * because touch_freq never will be higher than target freq */
 		/* Touch event occurred and being processed - Begin */
 		if(per_cpu(ds_sys_status, 0).flag_touch_timeout_count != 0){
 
@@ -1774,13 +1603,13 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 						break;
 					case 1:
 						per_cpu(ds_sys_status, 0).flag_touch_timeout_count = 0;
-						lc_target_cpu_op_index_touch = DS_CPU_OP_INDEX_MIN;
+						lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
 						per_cpu(ds_sys_status, 0).touch_timeout_sec = 0;
 						per_cpu(ds_sys_status, 0).touch_timeout_usec = 0;
 						break;
 					default:
 						per_cpu(ds_sys_status, 0).flag_touch_timeout_count = 0;
-						lc_target_cpu_op_index_touch = DS_CPU_OP_INDEX_MIN;
+						lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
 						per_cpu(ds_sys_status, 0).touch_timeout_sec = 0;
 						per_cpu(ds_sys_status, 0).touch_timeout_usec = 0;
 						break;
@@ -1911,7 +1740,7 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 						lc_target_cpu_op_index_touch = DS_CPU_OP_INDEX_TOUCH1;
 						break;
 					default:
-						lc_target_cpu_op_index_touch = DS_CPU_OP_INDEX_MIN;
+						lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
 						break;
 				}
 			}
@@ -1921,30 +1750,37 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 				lc_target_cpu_op_index_highest = lc_target_cpu_op_index_touch;
 		}
 		/* Touch event occurred and being processed - End */
-
+#endif
 		/* Special treatment upon frequency ceiling or flooring - Begin */
 		/* Ceiled by long consecutive touches */
 		if(per_cpu(ds_sys_status, 0).flag_long_consecutive_touches == 1){
 			if(lc_target_cpu_op_index_highest > DS_CPU_OP_INDEX_CONT_TOUCH)
 				lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_CONT_TOUCH;
 		}
+#if 0
+		/* Huexxx: already ceiled within ds_get_next_high_cpu_op_index() function */
 		/* Ceiled by cpufreq sysfs */
 		if(per_cpu(ds_sys_status, 0).locked_max_cpu_op_index < DS_CPU_OP_INDEX_MAX){
 			if(lc_target_cpu_op_index_highest > per_cpu(ds_sys_status, 0).locked_max_cpu_op_index)
 				lc_target_cpu_op_index_highest = per_cpu(ds_sys_status, 0).locked_max_cpu_op_index;
 		}
+#endif
+
 		/* Floored by cpufreq sysfs */
-		if(per_cpu(ds_sys_status, 0).locked_min_cpu_op_index > DS_CPU_OP_INDEX_MIN){
+		if(lc_target_cpu_op_index_lower > lc_target_cpu_op_index_highest)
+			lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
+#if 0
+		if(lc_target_cpu_op_index_lower > DS_CPU_OP_INDEX_MIN){	
 			per_cpu(ds_sys_status, 0).locked_min_cpu_op_release_sec = 
 				per_cpu(ds_counter, ds_cpu).elapsed_sec + DS_CPU_OP_LOCK_SUSTAIN_SEC;
 			per_cpu(ds_sys_status, 0).flag_locked_min_cpu_op = 1;
-			if(per_cpu(ds_sys_status, 0).locked_min_cpu_op_index > DS_CPU_OP_INDEX_LOCKED_MIN){
+			if(lc_target_cpu_op_index_lower > DS_CPU_OP_INDEX_LOCKED_MIN){
 				if(lc_target_cpu_op_index_highest < DS_CPU_OP_INDEX_LOCKED_MIN)
 					lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_LOCKED_MIN;
 			}
 			else{
-				if(lc_target_cpu_op_index_highest < per_cpu(ds_sys_status, 0).locked_min_cpu_op_index)
-					lc_target_cpu_op_index_highest = per_cpu(ds_sys_status, 0).locked_min_cpu_op_index;
+				if(lc_target_cpu_op_index_highest < lc_target_cpu_op_index_lower)
+					lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
 			}
 		}
 		/* Frequency had been floored. But not now */
@@ -1962,11 +1798,16 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 			}
 		}
 		/* Special care for the frequency locking through cpufreq sysfs - End */
+#endif
 	}
 	/* LCD is off (i.e., after early suspend) */
 	else{
-		if(lc_target_cpu_op_index_highest < DS_CPU_OP_INDEX_MAX)
-			lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_MIN;
+
+		if(lc_target_cpu_op_index_highest < per_cpu(ds_sys_status, 0).locked_max_cpu_op_index)
+			lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
+		/* Mantain minmax behaviour but with a 800MHz limit*/
+		else if (lc_target_cpu_op_index_highest > DS_CPU_OP_INDEX_6)
+			lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_6;
 	}
 
 	*target_cpu_op_index = lc_target_cpu_op_index_highest;
@@ -1992,10 +1833,10 @@ int ds_initialize_ds_control(void){
 
 int ds_initialize_ds_sys_status(void){
 
-	per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = DS_CPU_OP_INDEX_MIN;
+	per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = DS_CPU_OP_INDEX_13;
 	per_cpu(ds_sys_status, 0).locked_min_cpu_op_release_sec = 0;
 	per_cpu(ds_sys_status, 0).flag_locked_min_cpu_op = 0;
-	per_cpu(ds_sys_status, 0).locked_max_cpu_op_index = DS_CPU_OP_INDEX_MAX;
+	per_cpu(ds_sys_status, 0).locked_max_cpu_op_index = DS_CPU_OP_INDEX_4;
 	per_cpu(ds_sys_status, 0).locked_min_iva_freq = 0;
 	per_cpu(ds_sys_status, 0).locked_min_l3_freq = 0;
 

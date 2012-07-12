@@ -91,11 +91,14 @@
 #define DS_CPU_OP_INDEX_12	200000000
 #define DS_CPU_OP_INDEX_13	100000000
 
-#define DS_CPU_OP_INDEX_MAX		DS_CPU_OP_INDEX_0
-#define DS_CPU_OP_INDEX_MIN		DS_CPU_OP_INDEX_13
+#if 0
+#define DS_CPU_OP_INDEX_MAX	DS_CPU_OP_INDEX_0
+#define DS_CPU_OP_INDEX_MIN	DS_CPU_OP_INDEX_13
+#endif
 
-#define DS_CPU_OP_INDEX_INI		DS_CPU_OP_INDEX_4
+#define DS_CPU_OP_INDEX_INI	DS_CPU_OP_INDEX_4
 
+#if 0
 #define DS_CPU_OP_INDEX_TOUCH40	DS_CPU_OP_INDEX_MIN
 #define DS_CPU_OP_INDEX_TOUCH39	DS_CPU_OP_INDEX_MIN
 #define DS_CPU_OP_INDEX_TOUCH38	DS_CPU_OP_INDEX_MIN
@@ -174,12 +177,13 @@
 #define DS_CPU_OP_SF_13	0x12f	// 0.074074...
 
 #define DS_CPU_OP_SF_MIN		DS_CPU_OP_SF_13
+#endif
 
 /* For ds_cpu_status.cpu_mode */
 #define DS_CPU_MODE_IDLE		0
 #define DS_CPU_MODE_TASK		1
-#define DS_CPU_MODE_SCHEDULE	2
-#define DS_CPU_MODE_DVS_SUITE	4
+#define DS_CPU_MODE_SCHEDULE		2
+#define DS_CPU_MODE_DVS_SUITE		4
 
 /* For do_dvs_suite() */
 #define DS_ENTRY_TIMER_IRQ		0
@@ -200,23 +204,23 @@
 #define DS_GETFP12FRA(x)		((x)&0x00000fff)
 
 /* Definitions for compare44bits() */
-#define DS_LARGER						1
-#define DS_EQUAL						0
-#define DS_SMALLER						-1
+#define DS_LARGER			1
+#define DS_EQUAL			0
+#define DS_SMALLER			-1
 
 /* Process static priority */
 #define DS_LINUX_DEFAULT_STATIC_PRIO	120
 
-#define DS_HRT_STATIC_PRIO				105		// 100 nice -15
-#define DS_DBSRT_STATIC_PRIO			110		// 110 nice -10
-#define DS_RBSRT_STATIC_PRIO			115		// 115 nice -5
-#define DS_NRT_STATIC_PRIO				120		// 120 nice 0
-#define DS_IDLE_PRIO					140
+#define DS_HRT_STATIC_PRIO		105		// 100 nice -15
+#define DS_DBSRT_STATIC_PRIO		110		// 110 nice -10
+#define DS_RBSRT_STATIC_PRIO		115		// 115 nice -5
+#define DS_NRT_STATIC_PRIO		120		// 120 nice 0
+#define DS_IDLE_PRIO			140
 
-#define DS_HRT_NICE						-15		// -15
-#define DS_DBSRT_NICE					-10		// -10
-#define DS_RBSRT_NICE					-5		// -5
-#define DS_NRT_NICE						0		// 0
+#define DS_HRT_NICE			-15		// -15
+#define DS_DBSRT_NICE			-10		// -10
+#define DS_RBSRT_NICE			-5		// -5
+#define DS_NRT_NICE			0		// 0
 
 /* Process rt_priority. 
    p->prio = p->normal_prio = 99 - p->rt_priority for SCHED_RR tasks.
@@ -229,53 +233,53 @@
 /* Scheduler type.
  */
 #define DS_SCHED_NORMAL			0
-#define DS_SCHED_RR				1
+#define DS_SCHED_RR			1
 
 /* Process type.
  */
-#define DS_HRT_TASK					0x1	// HRT		0001
+#define DS_HRT_TASK			0x1	// HRT		0001
 #define DS_SRT_UI_SERVER_TASK		0x2	// DBSRT	0010
 #define DS_SRT_UI_CLIENT_TASK		0x3	// DBSRT	0011
 #define DS_SRT_KERNEL_THREAD		0x4	// RBSRT	0100
-#define DS_SRT_DAEMON_TASK			0x5	// RBSRT	0101
-#define DS_NRT_TASK					0x6	// NRT		0110
+#define DS_SRT_DAEMON_TASK		0x5	// RBSRT	0101
+#define DS_NRT_TASK			0x6	// NRT		0110
 
-#define DS_MIN_RT_SCHED_TYPE	DS_SRT_UI_CLIENT_TASK	
+#define DS_MIN_RT_SCHED_TYPE		DS_SRT_UI_CLIENT_TASK	
 
-#define DS_TYPE_M				0xF		// 0000 0000 0000 1111
-#define DS_TYPE_N				0xFFF0	// 1111 1111 1111 0000
+#define DS_TYPE_M			0xF		// 0000 0000 0000 1111
+#define DS_TYPE_N			0xFFF0	// 1111 1111 1111 0000
 #define DS_TYPE_FIXED_M			0x10	// 0000 0000 0001 0000
 #define DS_TYPE_FIXED_N			0xFFEF	// 1111 1111 1110 1111
-#define DS_TYPE_2B_CHANGED_M	0x20	// 0000 0000 0010 0000
-#define DS_TYPE_2B_CHANGED_N	0xFFDF	// 1111 1111 1101 1111
+#define DS_TYPE_2B_CHANGED_M		0x20	// 0000 0000 0010 0000
+#define DS_TYPE_2B_CHANGED_N		0xFFDF	// 1111 1111 1101 1111
 
 /* The maximum allowable number of PID. 0 ~ 32767. */
 #define DS_PID_LIMIT			32768
 
 /* To cope with touch and key inputs */
-#define DS_TOUCH_CPU_OP_UP_CNT_MAX			40		// Fixed.
-#define DS_TOUCH_CPU_OP_UP_INTERVAL			100000	// 100 msec. Don't touch this. LG standard.
-#define DS_CPU_OP_INDEX_CONT_TOUCH			DS_CPU_OP_INDEX_6 // Huexxx: Mantaining 800 MHz...
+#define DS_TOUCH_CPU_OP_UP_CNT_MAX		40		// Fixed.
+#define DS_TOUCH_CPU_OP_UP_INTERVAL		100000	// 100 msec. Don't touch this. LG standard.
+#define DS_CPU_OP_INDEX_CONT_TOUCH		DS_CPU_OP_INDEX_6 // Huexxx: Mantaining 800 MHz...
 #define DS_CONT_TOUCH_THRESHOLD_USEC		150000	// 15 msec by 10.
-#define DS_CONT_TOUCH_CARE_WAIT_SEC			3		// 3 seconds
+#define DS_CONT_TOUCH_CARE_WAIT_SEC		3		// 3 seconds
 
 /* Definitions for AIDVS */
-#define DS_AIDVS_PE_MOVING_AVG_WEIGHT			3		/* 3. Weight for post early suspend */
-#define DS_AIDVS_NM_MOVING_AVG_WEIGHT			3		/* 3 */
+#define DS_AIDVS_PE_MOVING_AVG_WEIGHT		3		/* 3. Weight for post early suspend */
+#define DS_AIDVS_NM_MOVING_AVG_WEIGHT		3		/* 3 */
 
 /* Definitions for GPScheDVS */
-#define DS_AIDVS_PE_INTERVAL_LENGTH				500000	/* 500 msec */
-#define DS_AIDVS_NM_INTERVAL_LENGTH				30000	/* 30 msec <-- TUNE IT! */
+#define DS_AIDVS_PE_INTERVAL_LENGTH		500000	/* 500 msec */
+#define DS_AIDVS_NM_INTERVAL_LENGTH		30000	/* 30 msec <-- TUNE IT! */
 
-#define DS_MIN_CPU_OP_UPDATE_INTERVAL_U			3000	/* 3 msec */
-#define DS_MIN_CPU_OP_UPDATE_INTERVAL_D			3000	/* 3 msec */
+#define DS_MIN_CPU_OP_UPDATE_INTERVAL_U		3000	/* 3 msec */
+#define DS_MIN_CPU_OP_UPDATE_INTERVAL_D		3000	/* 3 msec */
 
-#define DS_INIT_DELAY_SEC						30		/* 60 seconds */
-#define DS_POST_EARLY_SUSPEND_DELAY_SEC			3		/* 3 seconds */
+#define DS_INIT_DELAY_SEC			30		/* 60 seconds */
+#define DS_POST_EARLY_SUSPEND_DELAY_SEC		3		/* 3 seconds */
 
 /* Consideration for the frequency locking through cpufreq sysfs */
-#define DS_CPU_OP_INDEX_LOCKED_MIN				DS_CPU_OP_INDEX_8 // Huexxx: Mantaining 600 MHz...
-#define DS_CPU_OP_LOCK_SUSTAIN_SEC				30
+#define DS_CPU_OP_INDEX_LOCKED_MIN		DS_CPU_OP_INDEX_8 // Huexxx: Mantaining 600 MHz...
+#define DS_CPU_OP_LOCK_SUSTAIN_SEC		30
 
 /***************************************************************************
  * Variables and data structures
@@ -308,8 +312,8 @@ extern DS_PARAM ds_parameter;
 
 struct dvs_suite_system_status {
 	/*
-		DS_TYPE_M				0xF		= 0000 0000 0000 1111
-		DS_TYPE_FIXED_M			0x10	= 0000 0000 0001 0000
+		DS_TYPE_M		0xF	= 0000 0000 0000 1111
+		DS_TYPE_FIXED_M		0x10	= 0000 0000 0001 0000
 		DS_TYPE_2B_CHANGED_M	0x20	= 0000 0000 0010 0000
 	 */
 	int type[DS_PID_LIMIT];
