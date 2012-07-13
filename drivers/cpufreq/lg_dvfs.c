@@ -1015,10 +1015,12 @@ unsigned long perf_requirement_fra_fp12)
 	}
 	else{
 		switch(per_cpu(ds_sys_status, 0).locked_max_cpu_op_index){
+#ifdef CONFIG_P970_OPPS_ENABLED
 			case 1350000000: 	goto OPP_13;
 			case 1300000000: 	goto OPP_12;
 			case 1200000000: 	goto OPP_11;
 			case 1100000000: 	goto OPP_10;
+#endif
 			case 1000000000: 	goto OPP_9;
 			case 900000000: 	goto OPP_8;
 			case 800000000: 	goto OPP_7;
@@ -1031,6 +1033,7 @@ unsigned long perf_requirement_fra_fp12)
 		}
 	}
 
+#ifdef CONFIG_P970_OPPS_ENABLED
 OPP_13:
 	if (perf_requirement_fra_fp12 > 3945) return(DS_CPU_OP_INDEX_0);
 	else if (perf_requirement_fra_fp12 > 3641) return(DS_CPU_OP_INDEX_1);
@@ -1088,6 +1091,7 @@ OPP_10:
 	else if (perf_requirement_fra_fp12 > 745) return(DS_CPU_OP_INDEX_11);
 	else if (perf_requirement_fra_fp12 > 373) return(DS_CPU_OP_INDEX_12);
 	else return(DS_CPU_OP_INDEX_13);
+#endif
 
 OPP_9:
 	if (perf_requirement_fra_fp12 > 3687) return(DS_CPU_OP_INDEX_4);
@@ -1379,10 +1383,12 @@ int ds_do_dvs_aidvs(int ds_cpu, unsigned int *target_cpu_op_index, DS_AIDVS_STAT
 				case DS_CPU_OP_INDEX_7:		stat->cpu_op_index = DS_CPU_OP_INDEX_7; break;
 				case DS_CPU_OP_INDEX_8:		stat->cpu_op_index = DS_CPU_OP_INDEX_8; break;
 				case DS_CPU_OP_INDEX_9:		stat->cpu_op_index = DS_CPU_OP_INDEX_9; break;
+#ifdef CONFIG_P970_OPPS_ENABLED
 				case DS_CPU_OP_INDEX_10:	stat->cpu_op_index = DS_CPU_OP_INDEX_10; break;
 				case DS_CPU_OP_INDEX_11:	stat->cpu_op_index = DS_CPU_OP_INDEX_11; break;
 				case DS_CPU_OP_INDEX_12:	stat->cpu_op_index = DS_CPU_OP_INDEX_12; break;
 				case DS_CPU_OP_INDEX_13:	stat->cpu_op_index = DS_CPU_OP_INDEX_13; break;
+#endif
 				default:			stat->cpu_op_index = DS_CPU_OP_INDEX_0; break;
 			}
 		}
@@ -3118,6 +3124,7 @@ update_cpu_op:
 		iva_dev = omap2_get_iva_device();
 
 		switch(per_cpu(ds_cpu_status, ds_cpu).target_cpu_op_index){
+#ifdef CONFIG_P970_OPPS_ENABLED
 			case DS_CPU_OP_INDEX_0:
 				omap_pm_cpu_set_freq(1350000000);	// VDD1_OPP13	1.35GHz
 				omap_device_set_rate(mpu_dev, mpu_dev, 1350000000);
@@ -3194,6 +3201,7 @@ update_cpu_op:
 					omap_device_set_rate(l3_dev, l3_dev, per_cpu(ds_sys_status, 0).locked_min_l3_freq);
 				}
 				break;
+#endif
 			case DS_CPU_OP_INDEX_4:
 				omap_pm_cpu_set_freq(1000000000);	// VDD1_OPP9	1GHz
 				omap_device_set_rate(mpu_dev, mpu_dev, 1000000000);
