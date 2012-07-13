@@ -254,7 +254,7 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 							VERY_HI_RATE) / 1000;
 	}
 
-	policy->min = policy->cpuinfo.min_freq;
+	policy->min = 300000;
 #ifdef CONFIG_P970_OPPS_ENABLED
 	policy->max = 1000000;
 #else

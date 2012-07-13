@@ -325,7 +325,10 @@ struct dvs_suite_system_status {
 	unsigned int locked_min_cpu_op_index;
 	unsigned long locked_min_cpu_op_release_sec;
 	int flag_locked_min_cpu_op;
+
+	unsigned int sysfs_max_cpu_op_index;
 	unsigned int locked_max_cpu_op_index;
+
 	unsigned int locked_min_iva_freq;	// OMAP3630 specific. See mach-omap2/pm.c
 	unsigned int locked_min_l3_freq;	// OMAP3630 specific. See mach-omap2/pm.c
 
@@ -442,6 +445,7 @@ extern int ds_do_dvs_gpschedvs(int, unsigned int *);
  * to call the main dvs suite function.
  */
 extern int ld_initialize_ds_control(void);
+extern int ld_initialize_ds_sysfs_status(void);
 extern int ld_initialize_ds_sys_status(void);
 extern int ld_initialize_ds_cpu_status(int);
 extern int ld_initialize_ds_counter(void);
@@ -453,6 +457,7 @@ extern void ld_do_dvs_suite(int);
  * The main dvs suite function.
  */
 extern int ds_initialize_ds_control(void);
+extern int ds_initialize_ds_sysfs_status(void);
 extern int ds_initialize_ds_sys_status(void);
 extern int ds_initialize_ds_cpu_status(int, int);
 extern int ds_initialize_ds_counter(int, int);

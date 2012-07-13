@@ -52,6 +52,11 @@ int ld_initialize_ds_control(void){
 	return(0);
 }
 
+int ld_initialize_ds_sysfs_status(void){
+	ds_initialize_ds_sysfs_status();
+	return(0);
+}
+
 int ld_initialize_ds_sys_status(void){
 	ds_initialize_ds_sys_status();
 	return(0);
