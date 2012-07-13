@@ -1851,11 +1851,14 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 	}
 	/* LCD is off (i.e., after early suspend) */
 	else{
-
-		if(lc_target_cpu_op_index_highest < per_cpu(ds_sys_status, 0).locked_max_cpu_op_index)
-			lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
-		/* Mantain minmax behaviour but with a 800MHz limit*/
-		else if (lc_target_cpu_op_index_highest > DS_CPU_OP_INDEX_6)
+		/* If target op is lower than max ... */
+		if (lc_target_cpu_op_index_highest < per_cpu(ds_sys_status, 0).locked_max_cpu_op_index)
+			/* ... and higher that 300MHz ... */
+			if (lc_target_cpu_op_index_highest > DS_CPU_OP_INDEX_11)
+				/* ... limit it to 300MHz */
+				lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_11;
+		/* Limit maximum frequency with screen of to 800MHz */
+		if (lc_target_cpu_op_index_highest > DS_CPU_OP_INDEX_6)
 			lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_6;
 	}
 
