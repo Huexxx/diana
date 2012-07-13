@@ -1454,16 +1454,18 @@ int ds_do_dvs_aidvs(int ds_cpu, unsigned int *target_cpu_op_index, DS_AIDVS_STAT
 	====================================================================*/
 int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 
-	unsigned int lc_target_cpu_op_index_lower = min(per_cpu(ds_sys_status, 0).locked_min_cpu_op_index,
-						        per_cpu(ds_sys_status, 0).locked_max_cpu_op_index);
-	unsigned int lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
-	unsigned int lc_target_cpu_op_index_aidvs = lc_target_cpu_op_index_lower;
-//	unsigned int lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
+	unsigned int lc_target_cpu_op_index_highest = per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index;
+	unsigned int lc_target_cpu_op_index_aidvs = lc_target_cpu_op_index_highest;
+//	unsigned int lc_target_cpu_op_index_touch = lc_target_cpu_op_index_highest;
 
 	/* Calc target_cpu_op based on workload */
 	ds_do_dvs_aidvs(ds_cpu, &lc_target_cpu_op_index_aidvs, &(per_cpu(ds_aidvs_status, ds_cpu)));
 
 	lc_target_cpu_op_index_highest = lc_target_cpu_op_index_aidvs;
+
+	/* Floored by cpufreq sysfs */
+	if(lc_target_cpu_op_index_highest < per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index )
+		lc_target_cpu_op_index_highest = per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index;
 
 	/* LCD is on (i.e., before early suspend) */
 	if(per_cpu(ds_sys_status, 0).flag_do_post_early_suspend == 0){
@@ -1652,13 +1654,13 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 						break;
 					case 1:
 						per_cpu(ds_sys_status, 0).flag_touch_timeout_count = 0;
-						lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
+						lc_target_cpu_op_index_touch = per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index;
 						per_cpu(ds_sys_status, 0).touch_timeout_sec = 0;
 						per_cpu(ds_sys_status, 0).touch_timeout_usec = 0;
 						break;
 					default:
 						per_cpu(ds_sys_status, 0).flag_touch_timeout_count = 0;
-						lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
+						lc_target_cpu_op_index_touch = per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index;
 						per_cpu(ds_sys_status, 0).touch_timeout_sec = 0;
 						per_cpu(ds_sys_status, 0).touch_timeout_usec = 0;
 						break;
@@ -1789,7 +1791,7 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 						lc_target_cpu_op_index_touch = DS_CPU_OP_INDEX_TOUCH1;
 						break;
 					default:
-						lc_target_cpu_op_index_touch = lc_target_cpu_op_index_lower;
+						lc_target_cpu_op_index_touch = per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index;
 						break;
 				}
 			}
@@ -1814,22 +1816,23 @@ int ds_do_dvs_gpschedvs(int ds_cpu, unsigned int *target_cpu_op_index){
 				lc_target_cpu_op_index_highest = per_cpu(ds_sys_status, 0).locked_max_cpu_op_index;
 		}
 #endif
-
-		/* Floored by cpufreq sysfs */
-		if(lc_target_cpu_op_index_lower > lc_target_cpu_op_index_highest)
-			lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
+		/* Floored again if locked_min is higher than sysfs_min */
+		if(lc_target_cpu_op_index_highest < per_cpu(ds_sys_status, 0).locked_min_cpu_op_index )
+			lc_target_cpu_op_index_highest = per_cpu(ds_sys_status, 0).locked_min_cpu_op_index;
 #if 0
-		if(lc_target_cpu_op_index_lower > DS_CPU_OP_INDEX_MIN){	
+		/* Huexxx: already floored at the beggining of this function */
+		/* Floored by cpufreq sysfs */
+		if(per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index > DS_CPU_OP_INDEX_MIN){	
 			per_cpu(ds_sys_status, 0).locked_min_cpu_op_release_sec = 
 				per_cpu(ds_counter, ds_cpu).elapsed_sec + DS_CPU_OP_LOCK_SUSTAIN_SEC;
 			per_cpu(ds_sys_status, 0).flag_locked_min_cpu_op = 1;
-			if(lc_target_cpu_op_index_lower > DS_CPU_OP_INDEX_LOCKED_MIN){
+			if(per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index > DS_CPU_OP_INDEX_LOCKED_MIN){
 				if(lc_target_cpu_op_index_highest < DS_CPU_OP_INDEX_LOCKED_MIN)
 					lc_target_cpu_op_index_highest = DS_CPU_OP_INDEX_LOCKED_MIN;
 			}
 			else{
-				if(lc_target_cpu_op_index_highest < lc_target_cpu_op_index_lower)
-					lc_target_cpu_op_index_highest = lc_target_cpu_op_index_lower;
+				if(lc_target_cpu_op_index_highest < per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index)
+					lc_target_cpu_op_index_highest = per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index;
 			}
 		}
 		/* Frequency had been floored. But not now */
