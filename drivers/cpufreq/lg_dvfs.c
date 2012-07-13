@@ -2,6 +2,7 @@
  *	linux/drivers/cpufreq/lg_dvfs.c
  *
  *	Copyright (C) 2010 Sookyoung Kim <sookyoung.kim@lge.com>
+ *      Modified by Huexxx from xda forum <-huexxx@gmail.com>
  */
 
 /* LKM START ***********************/
@@ -1034,6 +1035,44 @@ unsigned long perf_requirement_fra_fp12)
 	}
 
 #ifdef CONFIG_P970_OPPS_ENABLED
+/* New approach... until 600MHz all functions behave as 1000MHz config and
+ * after that linealy until the specific max_freq */
+OPP_13:
+	if (perf_requirement_fra_fp12 > 3987) return(DS_CPU_OP_INDEX_0);
+	else if (perf_requirement_fra_fp12 > 3769) return(DS_CPU_OP_INDEX_1);
+	else if (perf_requirement_fra_fp12 > 3550) return(DS_CPU_OP_INDEX_2);
+	else if (perf_requirement_fra_fp12 > 3332) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 3113) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 2895) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2677) return(DS_CPU_OP_INDEX_6);
+	else goto OPP_COM;
+
+OPP_12:
+	if (perf_requirement_fra_fp12 > 3862) return(DS_CPU_OP_INDEX_1);
+	else if (perf_requirement_fra_fp12 > 3628) return(DS_CPU_OP_INDEX_2);
+	else if (perf_requirement_fra_fp12 > 3394) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 3160) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 2926) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2692) return(DS_CPU_OP_INDEX_6);
+	else goto OPP_COM;
+
+OPP_11:
+	if (perf_requirement_fra_fp12 > 3823) return(DS_CPU_OP_INDEX_2);
+	else if (perf_requirement_fra_fp12 > 3550) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 3277) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 3004) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2731) return(DS_CPU_OP_INDEX_6);
+	else goto OPP_COM;
+
+OPP_10:
+	if (perf_requirement_fra_fp12 > 3769) return(DS_CPU_OP_INDEX_3);
+	else if (perf_requirement_fra_fp12 > 3441) return(DS_CPU_OP_INDEX_4);
+	else if (perf_requirement_fra_fp12 > 3113) return(DS_CPU_OP_INDEX_5);
+	else if (perf_requirement_fra_fp12 > 2786) return(DS_CPU_OP_INDEX_6);
+	else goto OPP_COM;
+
+#if 0
+/* Old approach... all functions are lineal */
 OPP_13:
 	if (perf_requirement_fra_fp12 > 3945) return(DS_CPU_OP_INDEX_0);
 	else if (perf_requirement_fra_fp12 > 3641) return(DS_CPU_OP_INDEX_1);
@@ -1092,12 +1131,16 @@ OPP_10:
 	else if (perf_requirement_fra_fp12 > 373) return(DS_CPU_OP_INDEX_12);
 	else return(DS_CPU_OP_INDEX_13);
 #endif
+#endif
 
 OPP_9:
 	if (perf_requirement_fra_fp12 > 3687) return(DS_CPU_OP_INDEX_4);
 	else if (perf_requirement_fra_fp12 > 3277) return(DS_CPU_OP_INDEX_5);
 	else if (perf_requirement_fra_fp12 > 2868) return(DS_CPU_OP_INDEX_6);
-	else if (perf_requirement_fra_fp12 > 2458) return(DS_CPU_OP_INDEX_7);
+	else goto OPP_COM;
+
+OPP_COM:
+	if (perf_requirement_fra_fp12 > 2458) return(DS_CPU_OP_INDEX_7);
 	else if (perf_requirement_fra_fp12 > 2048) return(DS_CPU_OP_INDEX_8);
 	else if (perf_requirement_fra_fp12 > 1639) return(DS_CPU_OP_INDEX_9);
 	else if (perf_requirement_fra_fp12 > 1229) return(DS_CPU_OP_INDEX_10);
