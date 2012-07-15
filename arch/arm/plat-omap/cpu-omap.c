@@ -406,34 +406,34 @@ static ssize_t overclock_show(struct kobject *kobj,
 	mpu_dev = omap2_get_mpuss_device();
 	if (IS_ERR(mpu_dev))
 		return -EINVAL;
-	if ( attr == &overclock_opp0_attr)
+	else if ( attr == &overclock_opp0_attr)
 		target_opp_nr = 0;
-	if ( attr == &overclock_opp1_attr)
+	else if ( attr == &overclock_opp1_attr)
 		target_opp_nr = 1;
-	if ( attr == &overclock_opp2_attr)
+	else if ( attr == &overclock_opp2_attr)
 		target_opp_nr = 2;
-	if ( attr == &overclock_opp3_attr)
+	else if ( attr == &overclock_opp3_attr)
 		target_opp_nr = 3;
-	if ( attr == &overclock_opp4_attr)
+	else if ( attr == &overclock_opp4_attr)
 		target_opp_nr = 4;
-	if ( attr == &overclock_opp5_attr)
+	else if ( attr == &overclock_opp5_attr)
 		target_opp_nr = 5;
-	if ( attr == &overclock_opp6_attr)
+	else if ( attr == &overclock_opp6_attr)
 		target_opp_nr = 6;
-	if ( attr == &overclock_opp7_attr)
+	else if ( attr == &overclock_opp7_attr)
 		target_opp_nr = 7;
-	if ( attr == &overclock_opp8_attr)
+	else if ( attr == &overclock_opp8_attr)
 		target_opp_nr = 8;
-	if ( attr == &overclock_opp9_attr)
+	else if ( attr == &overclock_opp9_attr)
 		target_opp_nr = 9;
 #ifdef CONFIG_P970_OPPS_ENABLED
-	if ( attr == &overclock_opp10_attr)
+	else if ( attr == &overclock_opp10_attr)
 		target_opp_nr = 10;
-	if ( attr == &overclock_opp11_attr)
+	else if ( attr == &overclock_opp11_attr)
 		target_opp_nr = 11;
-	if ( attr == &overclock_opp12_attr)
+	else if ( attr == &overclock_opp12_attr)
 		target_opp_nr = 12;
-	if ( attr == &overclock_opp13_attr)
+	else if ( attr == &overclock_opp13_attr)
 		target_opp_nr = 13;
 #endif
 	
@@ -472,73 +472,73 @@ static ssize_t overclock_store(struct kobject *k,
 		return -EINVAL;
 
 	// Hard coded clock limits
-	if (attr == &overclock_opp0_attr) {
+	else if (attr == &overclock_opp0_attr) {
 		target_opp_nr = 0;
 		opp_lower_limit = 50;
 		opp_upper_limit = 150;
 	}
-	if (attr == &overclock_opp1_attr) {
+	else if (attr == &overclock_opp1_attr) {
 		target_opp_nr = 1;
 		opp_lower_limit = 151;
 		opp_upper_limit = 250;
 	}
-	if (attr == &overclock_opp2_attr) {
+	else if (attr == &overclock_opp2_attr) {
 		target_opp_nr = 2;
 		opp_lower_limit = 251;
 		opp_upper_limit = 350;
 	}
-	if (attr == &overclock_opp3_attr) {
+	else if (attr == &overclock_opp3_attr) {
 		target_opp_nr = 3;
 		opp_lower_limit = 351;
 		opp_upper_limit = 450;
 	}
-	if (attr == &overclock_opp4_attr) {
+	else if (attr == &overclock_opp4_attr) {
 		target_opp_nr = 4;
 		opp_lower_limit = 451;
 		opp_upper_limit = 550;
 	}
-	if ( attr == &overclock_opp5_attr) {
+	else if ( attr == &overclock_opp5_attr) {
 		target_opp_nr = 5;
 		opp_lower_limit = 551;
 		opp_upper_limit = 650;
 	}
-	if ( attr == &overclock_opp6_attr) {
+	else if ( attr == &overclock_opp6_attr) {
 		target_opp_nr = 6;
 		opp_lower_limit = 651;
 		opp_upper_limit = 750;
 	}
-	if ( attr == &overclock_opp7_attr) {
+	else if ( attr == &overclock_opp7_attr) {
 		target_opp_nr = 7;
 		opp_lower_limit = 751;
 		opp_upper_limit = 850;
 	}
-	if ( attr == &overclock_opp8_attr) {
+	else if ( attr == &overclock_opp8_attr) {
 		target_opp_nr = 8;
 		opp_lower_limit = 851;
 		opp_upper_limit = 950;
 	}
-	if ( attr == &overclock_opp9_attr) {
+	else if ( attr == &overclock_opp9_attr) {
 		target_opp_nr = 9;
 		opp_lower_limit = 951;
 		opp_upper_limit = 1050;
 	}
 #ifdef CONFIG_P970_OPPS_ENABLED
-	if ( attr == &overclock_opp10_attr) {
+	else if ( attr == &overclock_opp10_attr) {
 		target_opp_nr = 10;
 		opp_lower_limit = 1051;
 		opp_upper_limit = 1150;
 	}
-	if ( attr == &overclock_opp11_attr) {
+	else if ( attr == &overclock_opp11_attr) {
 		target_opp_nr = 11;
 		opp_lower_limit = 1151;
 		opp_upper_limit = 1250;
 	}
-	if ( attr == &overclock_opp12_attr) {
+	else if ( attr == &overclock_opp12_attr) {
 		target_opp_nr = 12;
 		opp_lower_limit = 1251;
 		opp_upper_limit = 1325;
 	}
-	if ( attr == &overclock_opp13_attr) {
+	else if ( attr == &overclock_opp13_attr) {
 		target_opp_nr = 13;
 		opp_lower_limit = 1326;
 		opp_upper_limit = 1400;
@@ -580,11 +580,11 @@ static ssize_t overclock_store(struct kobject *k,
 				mpu_policy->cpuinfo.min_freq = freq/1000;
 			}
 #ifdef CONFIG_P970_OPPS_ENABLED
-			if(target_opp_nr == 13) {
+			else if(target_opp_nr == 13) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #else
-			if(target_opp_nr == 9) {
+			else if(target_opp_nr == 9) {
 				mpu_policy->cpuinfo.max_freq = freq/1000;
 			}
 #endif

@@ -285,47 +285,47 @@ static ssize_t overclock_vdd_show(struct kobject *kobj,
 	if(!mpu_dev || !mpu_freq_table)
 		return -EINVAL;
 
-	if ( attr == &overclock_vdd_opp0_attr) {
+	else if ( attr == &overclock_vdd_opp0_attr) {
 		target_opp = 0;
 	}
-	if ( attr == &overclock_vdd_opp1_attr) {
+	else if ( attr == &overclock_vdd_opp1_attr) {
 		target_opp = 1;
 	}
-	if ( attr == &overclock_vdd_opp2_attr) {
+	else if ( attr == &overclock_vdd_opp2_attr) {
 		target_opp = 2;
 	}
-	if ( attr == &overclock_vdd_opp3_attr) {
+	else if ( attr == &overclock_vdd_opp3_attr) {
 		target_opp = 3;
 	}
-	if ( attr == &overclock_vdd_opp4_attr) {
+	else if ( attr == &overclock_vdd_opp4_attr) {
 		target_opp = 4;
 	}
-	if ( attr == &overclock_vdd_opp5_attr) {
+	else if ( attr == &overclock_vdd_opp5_attr) {
 		target_opp = 5;
 	}
-	if ( attr == &overclock_vdd_opp6_attr) {
+	else if ( attr == &overclock_vdd_opp6_attr) {
 		target_opp = 6;
 	}
-	if ( attr == &overclock_vdd_opp7_attr) {
+	else if ( attr == &overclock_vdd_opp7_attr) {
 		target_opp = 7;
 	}
-	if ( attr == &overclock_vdd_opp8_attr) {
+	else if ( attr == &overclock_vdd_opp8_attr) {
 		target_opp = 8;
 	}
-	if ( attr == &overclock_vdd_opp9_attr) {
+	else if ( attr == &overclock_vdd_opp9_attr) {
 		target_opp = 9;
 	}
 #ifdef CONFIG_P970_OPPS_ENABLED
-	if ( attr == &overclock_vdd_opp10_attr) {
+	else if ( attr == &overclock_vdd_opp10_attr) {
 		target_opp = 10;
 	}
-	if ( attr == &overclock_vdd_opp11_attr) {
+	else if ( attr == &overclock_vdd_opp11_attr) {
 		target_opp = 11;
 	}
-	if ( attr == &overclock_vdd_opp12_attr) {
+	else if ( attr == &overclock_vdd_opp12_attr) {
 		target_opp = 12;
 	}
-	if ( attr == &overclock_vdd_opp13_attr) {
+	else if ( attr == &overclock_vdd_opp13_attr) {
 		target_opp = 13;
 	}
 #endif
