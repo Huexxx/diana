@@ -213,6 +213,7 @@ EXPORT_SYMBOL(omap4_get_dsp_device);
 #ifdef CONFIG_OMAP_PM
 /* Overclock vdd sysfs interface */
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+#if 0
 static ssize_t overclock_vdd_show(struct kobject *, struct kobj_attribute *,
               char *);
 static ssize_t overclock_vdd_store(struct kobject *k, struct kobj_attribute *,
@@ -249,6 +250,7 @@ static struct kobj_attribute overclock_vdd_opp13_attr =
     __ATTR(overclock_vdd_opp13, 0644, overclock_vdd_show, overclock_vdd_store);
 #endif
 #endif
+#endif
 
 /* PM stuff */
 static ssize_t vdd_opp_show(struct kobject *, struct kobj_attribute *, char *);
@@ -269,6 +271,7 @@ static struct kobj_attribute tick_control_attr =
 
 /* Overclock vdd sysfs interface */
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+#if 0
 static ssize_t overclock_vdd_show(struct kobject *kobj,
         struct kobj_attribute *attr, char *buf)
 {
@@ -468,6 +471,7 @@ static ssize_t overclock_vdd_store(struct kobject *k,
 	}*/
 	return -EINVAL;
 }
+#endif
 #endif
 
 /* PM stuff */
@@ -864,6 +868,7 @@ static int __init omap2_common_pm_init(void)
 
 		/* Overclock vdd sysfs interface */
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+#if 0
 		error = sysfs_create_file(power_kobj, &overclock_vdd_opp0_attr.attr);
 		if (error) {
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
@@ -935,6 +940,7 @@ static int __init omap2_common_pm_init(void)
 			printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
 			return error;
 		}
+#endif
 #endif
 #endif
 	}

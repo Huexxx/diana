@@ -62,6 +62,7 @@ static int cpus_initialized;
 #endif
 
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+#if 0
 static ssize_t overclock_show(struct kobject *, struct kobj_attribute *,
               char *);
 static ssize_t overclock_store(struct kobject *k, struct kobj_attribute *,
@@ -96,6 +97,7 @@ static struct kobj_attribute overclock_opp12_attr =
 	__ATTR(overclock_opp12, 0644, overclock_show, overclock_store);
 static struct kobj_attribute overclock_opp13_attr =
 	__ATTR(overclock_opp13, 0644, overclock_show, overclock_store);
+#endif
 #endif
 #endif
 
@@ -285,6 +287,7 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 #endif
 
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+#if 0
 	error = sysfs_create_file(power_kobj, &overclock_opp0_attr.attr);
 	if (error) {
 		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
@@ -358,6 +361,7 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 	}
 #endif
 #endif
+#endif
 
 	return 0;
 }
@@ -395,6 +399,7 @@ static int __init omap_cpufreq_init(void)
 }
 
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
+#if 0
 static ssize_t overclock_show(struct kobject *kobj,
         struct kobj_attribute *attr, char *buf)
 {
@@ -604,6 +609,7 @@ static ssize_t overclock_store(struct kobject *k,
 	return -EINVAL;
 	return n;
 }
+#endif
 #endif
 
 late_initcall(omap_cpufreq_init);
