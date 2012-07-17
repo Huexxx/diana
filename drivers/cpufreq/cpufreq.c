@@ -476,6 +476,7 @@ static int __cpufreq_set_policy(struct cpufreq_policy *data,
 static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char *buf, size_t count)
 {
 	unsigned int ret = -EINVAL;
+	unsigned long order = 0;
 	struct cpufreq_policy new_policy;
 	struct device *mpu_dev = omap2_get_mpuss_device();
 
@@ -487,9 +488,22 @@ static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char 
 	if(ret != 1)
 		return -EINVAL;
 
+	/* Ensure that frequency belongs to a specific opp */
+	order = opp_find_freq_exact2(mpu_dev, new_policy.min*1000);
+	if(order == 0)
+		return -EINVAL;
+
+	/* Ensure that frequency is lower or equal than max */
+	if(order > policy->max_order)
+		return -EINVAL;
+
+	/* Ensure that frequency is lower or equal than 1200MHz */
+	if(order > 12)
+		return -EINVAL;
+
 	ret = __cpufreq_set_policy(policy, &new_policy);
 	policy->user_policy.min = policy->min;
-	policy->min_order = opp_find_freq_exact2(mpu_dev, policy->min*1000);
+	policy->min_order = order;
 
 #ifdef CONFIG_LGE_DVFS
 	//printk(KERN_WARNING "store_scaling_min_freq(): To %u\n", policy->min);
@@ -506,6 +520,7 @@ static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char 
 static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char *buf, size_t count)
 {
 	unsigned int ret = -EINVAL;
+	unsigned long order = 0;
 	struct cpufreq_policy new_policy;
 	struct device *mpu_dev = omap2_get_mpuss_device();
 
@@ -517,9 +532,22 @@ static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char 
 	if(ret != 1)
 		return -EINVAL;
 
+	/* Ensure that frequency belongs to a specific opp */
+	order = opp_find_freq_exact2(mpu_dev, new_policy.max*1000);
+	if(order == 0)
+		return -EINVAL;
+
+	/* Ensure that frequency is higher or equal than min */
+	if(order < policy->min_order)
+		return -EINVAL;
+
+	/* Ensure that frequency is higher or equal than 300MHz */
+	if(order < 3)
+		return -EINVAL;
+
 	ret = __cpufreq_set_policy(policy, &new_policy);
 	policy->user_policy.max = policy->max;
-	policy->max_order = opp_find_freq_exact2(mpu_dev, policy->max*1000);
+	policy->max_order = order;
 
 #ifdef CONFIG_LGE_DVFS
 	//printk(KERN_WARNING "store_scaling_max_freq(): To %u\n", policy->max);
