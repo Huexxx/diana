@@ -737,7 +737,7 @@ unsigned long opp_find_freq_exact2(struct device *dev, unsigned long freq)
 {
 	struct device_opp *dev_opp;
 	struct omap_opp *temp_opp = ERR_PTR(-ENODEV);
-	unsigned long req_freq = freq / 1000000;
+	unsigned long req_freq = freq / 1000;
 	unsigned long order = 0;
 	unsigned long i = 1;
 
@@ -746,7 +746,7 @@ unsigned long opp_find_freq_exact2(struct device *dev, unsigned long freq)
 		return order;
 
 	list_for_each_entry(temp_opp, &dev_opp->opp_list, node) {
-		unsigned long rate = temp_opp->rate / 1000000;
+		unsigned long rate = temp_opp->rate / 1000;
 		if (rate == req_freq) {
 			order = i;
 			break;
