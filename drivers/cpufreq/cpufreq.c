@@ -477,6 +477,7 @@ static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char 
 {
 	unsigned int ret = -EINVAL;
 	struct cpufreq_policy new_policy;
+	struct device *mpu_dev = omap2_get_mpuss_device();
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if(ret)
@@ -488,6 +489,7 @@ static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char 
 
 	ret = __cpufreq_set_policy(policy, &new_policy);
 	policy->user_policy.min = policy->min;
+	policy->min_order = opp_find_freq_exact2(mpu_dev, policy->min*1000);
 
 #ifdef CONFIG_LGE_DVFS
 	//printk(KERN_WARNING "store_scaling_min_freq(): To %u\n", policy->min);
@@ -505,6 +507,7 @@ static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char 
 {
 	unsigned int ret = -EINVAL;
 	struct cpufreq_policy new_policy;
+	struct device *mpu_dev = omap2_get_mpuss_device();
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if(ret)
@@ -516,6 +519,7 @@ static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char 
 
 	ret = __cpufreq_set_policy(policy, &new_policy);
 	policy->user_policy.max = policy->max;
+	policy->max_order = opp_find_freq_exact2(mpu_dev, policy->max*1000);
 
 #ifdef CONFIG_LGE_DVFS
 	//printk(KERN_WARNING "store_scaling_max_freq(): To %u\n", policy->max);

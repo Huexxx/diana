@@ -90,6 +90,8 @@ struct cpufreq_policy {
 	unsigned int		cpu;    /* cpu nr of registered CPU */
 	struct cpufreq_cpuinfo	cpuinfo;/* see above */
 
+	unsigned int		min_order; /* from 1 to n */
+	unsigned int		max_order; /* from 1 to n */
 	unsigned int		min;    /* in kHz */
 	unsigned int		max;    /* in kHz */
 	unsigned int		cur;    /* in kHz, only needed if cpufreq

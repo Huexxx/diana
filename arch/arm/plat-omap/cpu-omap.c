@@ -101,6 +101,21 @@ static struct kobj_attribute overclock_opp13_attr =
 #endif
 #endif
 
+/* Huexxx: sysfs parameters to control min and max enabled opps */
+static ssize_t opp_show(struct kobject *, struct kobj_attribute *,
+              char *);
+static ssize_t opp_store(struct kobject *k, struct kobj_attribute *,
+			  const char *buf, size_t n);
+
+static struct kobj_attribute opp_min_attr =
+	__ATTR(opp_min, 0644, opp_show, opp_store);
+static struct kobj_attribute opp_max_attr =
+	__ATTR(opp_max, 0644, opp_show, opp_store);
+static struct kobj_attribute opp_mpu_attr =
+	__ATTR(opp_mpu, 0644, opp_show, opp_store);
+static struct kobj_attribute opp_iva_attr =
+	__ATTR(opp_iva, 0644, opp_show, opp_store);
+
 /* TODO: Add support for SDRAM timing changes */
 
 static int omap_verify_speed(struct cpufreq_policy *policy)
@@ -257,11 +272,9 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 	}
 
 	policy->min = 300000;
-#ifdef CONFIG_P970_OPPS_ENABLED
+	policy->min_order = 3;
 	policy->max = 1000000;
-#else
-	policy->max = policy->cpuinfo.max_freq;
-#endif
+	policy->max_order = 10;
 	policy->cur = omap_getspeed(policy->cpu);
 
 	/* FIXME: what's the actual transition time? */
@@ -362,6 +375,27 @@ static int omap_cpu_init(struct cpufreq_policy *policy)
 #endif
 #endif
 #endif
+
+	error = sysfs_create_file(power_kobj, &opp_min_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &opp_max_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &opp_mpu_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
+	error = sysfs_create_file(power_kobj, &opp_iva_attr.attr);
+	if (error) {
+		printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+		return error;
+	}
 
 	return 0;
 }
@@ -611,6 +645,90 @@ static ssize_t overclock_store(struct kobject *k,
 }
 #endif
 #endif
+
+static ssize_t opp_show(struct kobject *kobj,
+        struct kobj_attribute *attr, char *buf)
+{
+	struct device *mpu_dev = omap2_get_mpuss_device();
+	struct device *iva_dev = omap2_get_iva_device();
+	struct cpufreq_policy *mpu_policy = cpufreq_cpu_get(0);
+
+	if (IS_ERR(mpu_dev) || IS_ERR(iva_dev) || IS_ERR(mpu_policy))
+		return -EINVAL;
+	else if (attr == &opp_min_attr) {
+		return sprintf(buf, "%lu %lu\n", mpu_policy->min_order, mpu_policy->min/1000);
+	} else if (attr == &opp_max_attr) {
+		return sprintf(buf, "%lu %lu\n", mpu_policy->max_order, mpu_policy->max/1000);
+	} else if ( attr == &opp_mpu_attr) {
+		unsigned int i;
+		unsigned long freq, result;
+		ssize_t count = 0;
+		for (i = 1; i <= 14; i++) {
+			freq = opp_get_freq2(mpu_dev, i);
+			result = opp_get_state(mpu_dev, i);
+			count += sprintf(&buf[count], "%lu %lu\n", freq, result);
+		}
+		return count;
+	} else if ( attr == &opp_iva_attr) {
+		unsigned int i;
+		unsigned long freq, result;
+		ssize_t count = 0;
+		for (i = 1; i <= 14; i++) {
+			freq = opp_get_freq2(iva_dev, i);
+			result = opp_get_state(iva_dev, i);
+			count += sprintf(&buf[count], "%lu %lu\n", freq, result);
+		}
+		return count;
+	} 
+}
+
+static ssize_t opp_store(struct kobject *k,
+        struct kobj_attribute *attr, const char *buf, size_t n)
+{
+	unsigned int order = 0;
+	struct device *mpu_dev = omap2_get_mpuss_device();
+	struct cpufreq_policy *mpu_policy = cpufreq_cpu_get(0);
+	
+	if (IS_ERR(mpu_policy) || IS_ERR(mpu_dev))
+		return -EINVAL;
+	else if (attr == &opp_min_attr) {
+		unsigned long min_freq;
+		if (sscanf(buf, "%u", &order) == 1) {
+			if ((order > 0) && (order <=12)) {
+				min_freq = opp_get_freq2(mpu_dev, order);
+				if (min_freq <= mpu_policy->max*1000) {
+					mpu_policy->min = mpu_policy->user_policy.min = min_freq/1000;
+					mpu_policy->min_order = order;
+#ifdef CONFIG_LGE_DVFS
+					if(ds_control.on_dvs == 1) {
+						per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index = min_freq;
+						per_cpu(ds_sys_status, 0).locked_min_cpu_op_index = min_freq;
+					}					
+#endif	// CONFIG_LGE_DVFS
+				} else return -EINVAL;
+			} else return -EINVAL;
+		} else return -EINVAL;
+	} else if (attr == &opp_max_attr) {
+		unsigned long max_freq;
+		if (sscanf(buf, "%u", &order) == 1) {
+			if ((order >= 2) && (order <=14)) {
+				max_freq = opp_get_freq2(mpu_dev, order);
+				if (max_freq >= mpu_policy->min*1000) {
+					mpu_policy->max = mpu_policy->user_policy.max = max_freq/1000;
+					mpu_policy->max_order = order;
+#ifdef CONFIG_LGE_DVFS
+					if(ds_control.on_dvs == 1) {
+						per_cpu(ds_sys_status, 0).sysfs_max_cpu_op_index = max_freq;
+						per_cpu(ds_sys_status, 0).locked_max_cpu_op_index = max_freq;
+					}					
+#endif	// CONFIG_LGE_DVFS
+				} else return -EINVAL;
+			} else return -EINVAL;
+		} else return -EINVAL;
+	} else return -EINVAL;
+	cpufreq_update_policy(0);
+	return n;
+}
 
 late_initcall(omap_cpufreq_init);
 

@@ -21,6 +21,7 @@
 #include <plat/omap-pm.h>
 #include <plat/omap_device.h>
 #include <plat/common.h>
+#include <linux/cpufreq.h>
 #ifdef CONFIG_P970_OVERCLOCK_ENABLED
 #include <plat/opp.h>
 #include <plat/voltage.h>
@@ -502,7 +503,7 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 #ifdef CONFIG_LGE_DVFS
 	unsigned long lc_freq = 0;
 #endif	// CONFIG_LGE_DVFS
-
+	
 	if (sscanf(buf, "%lu", &value) != 1)
 		return -EINVAL;
 
@@ -537,13 +538,15 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 				u8 i = 0;
 				unsigned long freq = 0;
 				struct cpufreq_frequency_table *freq_table = *omap_pm_cpu_get_freq_table();
+				struct cpufreq_policy *mpu_policy = cpufreq_cpu_get(0);
 				if (freq_table == NULL) {
 					printk(KERN_ERR "%s: Could not get freq_table\n", __func__);
 					return -ENODEV;
 				}
 				for (i = 0; freq_table[i].frequency != CPUFREQ_TABLE_END; i++) {
 					if (freq_table[i].index == value - 1) {
-						freq = freq_table[i].frequency;
+						/* Ensure that freq value is floored by cpufreq */
+						freq = max(freq_table[i].frequency, mpu_policy->min);
 #ifdef CONFIG_LGE_DVFS
 						lc_freq = freq * 1000;
 #endif	// CONFIG_LGE_DVFS
@@ -647,11 +650,13 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr, 
 	} else if (attr == &dsp_freq_attr) {
 		u8 i, opp_id = 0;
 		struct omap_opp *opp_table = omap_pm_dsp_get_opp_table();
+		struct cpufreq_policy *mpu_policy = cpufreq_cpu_get(0);
 		if (opp_table == NULL) {
 			printk(KERN_ERR "%s: Could not get dsp opp_table\n", __func__);
 			return -ENODEV;
 		}
-		for (i = 1; opp_table[i].rate; i++) {
+		/* Ensure that freq value is floored by cpufreq */
+		for (i = mpu_policy->min_order; opp_table[i].rate; i++) {
 			if (opp_table[i].rate >= value) {
 				opp_id = i;
 #ifdef CONFIG_LGE_DVFS

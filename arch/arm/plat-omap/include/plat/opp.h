@@ -122,6 +122,11 @@ void opp_exit_cpufreq_table(struct cpufreq_frequency_table **table);
 
 struct device **opp_init_voltage_params(struct voltagedomain *voltdm,
 					int *dev_count);
+unsigned long opp_get_state(struct device *dev, unsigned int opp_order);
+
+unsigned long opp_get_freq2(struct device *dev, unsigned int opp_order);
+
+unsigned long opp_find_freq_exact2(struct device *dev, unsigned long freq);
 #else
 static inline unsigned long opp_get_voltage(const struct omap_opp *opp)
 {
@@ -223,6 +228,21 @@ static inline struct device **opp_init_voltage_params(
 			struct voltagedomain *voltdm, int *dev_count)
 {
 	return ERR_PTR(-EINVAL);
+}
+
+static inline unsigned long opp_get_state(struct device *dev, unsigned int opp_order)
+{
+	return 0;
+}
+
+static inline unsigned long opp_get_freq2(struct device *dev, unsigned int opp_order)
+{
+	return 0;
+}
+
+static inline unsigned long opp_find_freq_exact2(struct device *dev, unsigned long freq)
+{
+	return 0;
 }
 
 #endif		/* CONFIG_PM */

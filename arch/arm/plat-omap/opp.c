@@ -674,3 +674,84 @@ struct device **opp_init_voltage_params(struct voltagedomain *voltdm,
 	*dev_count = count;
 	return dev_list;
 }
+
+/**
+ * opp_get_state() - get the state of an opp
+ * @opp:
+ * @opp_order: opp to get the state
+ *
+ * Returns 0 if false, 1 if true, 2 if error.
+ */
+unsigned long opp_get_state(struct device *dev, unsigned int opp_order)
+{
+	unsigned int i = 1;
+	struct device_opp *dev_opp;
+	struct omap_opp *temp_opp = ERR_PTR(-ENODEV);
+
+	dev_opp = find_device_opp(dev);
+	if (IS_ERR(dev_opp))
+		return 2;
+
+	list_for_each_entry(temp_opp, &dev_opp->opp_list, node) {
+		if (i < opp_order) i++;
+		else break;
+	}
+	if (temp_opp->enabled) return 1;
+	else return 0;
+}
+
+/**
+ * opp_get_freq2() - get the freq of an opp
+ * @opp:
+ * @opp_order: opp to get the state
+ *
+ * Notes...
+ */
+unsigned long opp_get_freq2(struct device *dev, unsigned int opp_order)
+{
+	unsigned int i = 1;
+	struct device_opp *dev_opp;
+	struct omap_opp *temp_opp = ERR_PTR(-ENODEV);
+
+	dev_opp = find_device_opp(dev);
+	if (IS_ERR(dev_opp))
+		return 0;
+
+	list_for_each_entry(temp_opp, &dev_opp->opp_list, node) {
+		if (i < opp_order) i++;
+		else break;
+	}
+	return opp_get_freq(temp_opp);
+}
+
+/**
+ * opp_find_freq_exact2() - search for an exact frequency
+ * @opp_type:	OPP type we want to search in.
+ * @freq:	frequency to search for
+ * 
+ * Searches for exact match in the opp list and returns order of the matching
+ * opp, else returns 0 in case of error.
+ *
+ */
+unsigned long opp_find_freq_exact2(struct device *dev, unsigned long freq)
+{
+	struct device_opp *dev_opp;
+	struct omap_opp *temp_opp = ERR_PTR(-ENODEV);
+	unsigned long req_freq = freq / 1000000;
+	unsigned long order = 0;
+	unsigned long i = 1;
+
+	dev_opp = find_device_opp(dev);
+	if (IS_ERR(dev_opp))
+		return order;
+
+	list_for_each_entry(temp_opp, &dev_opp->opp_list, node) {
+		unsigned long rate = temp_opp->rate / 1000000;
+		if (rate == req_freq) {
+			order = i;
+			break;
+		} else i++;
+	}
+
+	return order;
+}
