@@ -32,12 +32,17 @@
 #include <plat/voltage.h>
 #include "smartreflex-class1p5.h"
 
+#include <linux/module.h>
+
 #define MAX_VDDS 3
 #define SR1P5_SAMPLING_DELAY_MS	1
 #define SR1P5_STABLE_SAMPLES	5
 #define SR1P5_MAX_TRIGGERS	5
 
-#define SR_DEBUG 1
+#define SR_DEBUG	 	1
+
+#define VTWEAK_STEP		12500
+#define VTWEAK_LEVELS		3
 
 /*
  * we expect events in 10uS, if we dont get 2wice times as much,
@@ -65,6 +70,10 @@ struct sr_class1p5_work_data {
 };
 
 #if CONFIG_OMAP_SR_CLASS1P5_RECALIBRATION_DELAY
+static int voltage_tweak = 0;
+module_param(voltage_tweak, int, 0600);
+MODULE_PARM_DESC(voltage_tweak, "Voltage tweak value * 12500");
+
 /* recal_work:	recalibration calibration work */
 static struct delayed_work recal_work;
 #endif
@@ -277,14 +286,19 @@ done_calib:
 	 */
 
 	if (cpu_is_omap3630()) {
+		if (voltage_tweak > VTWEAK_LEVELS)
+			voltage_tweak = VTWEAK_LEVELS;
+		if (voltage_tweak < -VTWEAK_LEVELS)
+			voltage_tweak = -VTWEAK_LEVELS;
 #if SR_DEBUG	
-		pr_info("%s: %s - volt nominal %d, sr opp margin %d \n",
-			__func__, voltdm->name, volt_data->volt_nominal, volt_data->sr_oppmargin);
+		pr_info("%s: %s - volt nominal %d, sr opp margin %d, voltage tweak %d \n",
+			__func__, voltdm->name, volt_data->volt_nominal, volt_data->sr_oppmargin, voltage_tweak*VTWEAK_STEP);
 #endif
 		volt_data->volt_calibrated += volt_data->sr_oppmargin;
-		if (volt_data->volt_calibrated > volt_data->volt_nominal) {
+		if (voltage_tweak != 0)
+			volt_data->volt_calibrated += voltage_tweak*VTWEAK_STEP;
+		if (volt_data->volt_calibrated > volt_data->volt_nominal)
 			volt_data->volt_calibrated = volt_data->volt_nominal;
-		}
 	}
 
 	if (volt_data->volt_calibrated != u_volt_current) {
