@@ -497,8 +497,8 @@ static ssize_t store_scaling_min_freq(struct cpufreq_policy *policy, const char 
 	if(order > policy->max_order)
 		return -EINVAL;
 
-	/* Ensure that frequency is lower or equal than 1200MHz */
-	if(order > 12)
+	/* Ensure that frequency is lower or equal than 1350MHz */
+	if(order > 14)
 		return -EINVAL;
 
 	ret = __cpufreq_set_policy(policy, &new_policy);
@@ -541,8 +541,8 @@ static ssize_t store_scaling_max_freq(struct cpufreq_policy *policy, const char 
 	if(order < policy->min_order)
 		return -EINVAL;
 
-	/* Ensure that frequency is higher or equal than 300MHz */
-	if(order < 3)
+	/* Ensure that frequency is higher or equal than 100MHz */
+	if(order < 1)
 		return -EINVAL;
 
 	ret = __cpufreq_set_policy(policy, &new_policy);

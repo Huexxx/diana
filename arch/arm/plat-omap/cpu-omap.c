@@ -694,7 +694,7 @@ static ssize_t opp_store(struct kobject *k,
 	else if (attr == &opp_min_attr) {
 		unsigned long min_freq;
 		if (sscanf(buf, "%u", &order) == 1) {
-			if ((order > 0) && (order <=12)) {
+			if ((order > 0) && (order <=14)) {
 				min_freq = opp_get_freq2(mpu_dev, order);
 				if (min_freq <= mpu_policy->max*1000) {
 					mpu_policy->min = mpu_policy->user_policy.min = min_freq/1000;
@@ -711,7 +711,7 @@ static ssize_t opp_store(struct kobject *k,
 	} else if (attr == &opp_max_attr) {
 		unsigned long max_freq;
 		if (sscanf(buf, "%u", &order) == 1) {
-			if ((order >= 2) && (order <=14)) {
+			if ((order > 0) && (order <=14)) {
 				max_freq = opp_get_freq2(mpu_dev, order);
 				if (max_freq >= mpu_policy->min*1000) {
 					mpu_policy->max = mpu_policy->user_policy.max = max_freq/1000;
