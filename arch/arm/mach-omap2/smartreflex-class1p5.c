@@ -42,7 +42,7 @@
 #define SR_DEBUG	 	1
 
 #define VTWEAK_STEP		12500
-#define VTWEAK_LEVELS		3
+#define VTWEAK_LEVELS		7
 
 /*
  * we expect events in 10uS, if we dont get 2wice times as much,
