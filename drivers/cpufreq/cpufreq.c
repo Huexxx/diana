@@ -728,9 +728,12 @@ static ssize_t store_turn_on_lg_dvfs(struct cpufreq_policy *policy, const char *
 
     sscanf(buf, "%d", &value);
 
-	if(value == 1)
+	if(value < -3){
+		printk(KERN_ERR "store_turn_on_lg_dvfs: Invalid value\n");
+		return -EINVAL;
+	}else if(value == 1){
 		printk(KERN_WARNING "[LG-DVFS] LG-DVFS false start\n");
-	else if(value == 0){
+	}else if(value == 0){
         	printk(KERN_WARNING "[LG-DVFS] LG-DVFS was turned off\n");
 		ds_control.on_dvs = 0;
 		ds_control.flag_run_dvs = 0;
@@ -750,15 +753,15 @@ static ssize_t store_turn_on_lg_dvfs(struct cpufreq_policy *policy, const char *
 		ds_control.on_dvs = 1;
 		dvs_suite_wq = create_workqueue("dvs_suite");
 		dvs_suite_timer_init();
-	}else if(value == -2)
+	}else if(value == -2){
 		ds_control.aidvs_moving_avg_weight = 0;
-	else if(value == -1)
+	}else if(value == -1){
 		ds_control.aidvs_moving_avg_weight = 1;
-	else if(value < 10)
+	}else if(value < 10){
 		ds_control.aidvs_moving_avg_weight = value;
-	else if(value < 1000000)
+	}else if(value < 1000000){
 		ds_control.aidvs_interval_length = value;
-	else{
+	}else{
 		printk(KERN_ERR "store_turn_on_lg_dvfs: Invalid value\n");
 		return -EINVAL;
 	}
