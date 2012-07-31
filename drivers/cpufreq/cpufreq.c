@@ -728,45 +728,39 @@ static ssize_t store_turn_on_lg_dvfs(struct cpufreq_policy *policy, const char *
 
     sscanf(buf, "%d", &value);
 
-	if(value == 0){
-        printk(KERN_WARNING "[LG-DVFS] LG-DVFS was turned off\n");
+	if(value == 1)
+		printk(KERN_WARNING "[LG-DVFS] LG-DVFS false start\n");
+	else if(value == 0){
+        	printk(KERN_WARNING "[LG-DVFS] LG-DVFS was turned off\n");
 		ds_control.on_dvs = 0;
 		ds_control.flag_run_dvs = 0;
 		dvs_suite_timer_exit();
 		destroy_workqueue(dvs_suite_wq);
-    }
+    	}else if(value == -3){
+		printk(KERN_WARNING "[LG-DVFS] LG-DVFS is ready to run\n");
+		/* Initialize LG-DVFS upon enabling it */
+		ld_initialize_ds_control();
+		/* Initialice sysfs limits according to actual limits */
+		per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index = (policy->min)*1000;
+		per_cpu(ds_sys_status, 0).sysfs_max_cpu_op_index = (policy->max)*1000;
+		ld_initialize_ds_sys_status();			
+		ld_initialize_ds_cpu_status(DS_CPU_MODE_TASK);
+		ld_initialize_ds_counter();
+		ld_initialize_aidvs();
+		ds_control.on_dvs = 1;
+		dvs_suite_wq = create_workqueue("dvs_suite");
+		dvs_suite_timer_init();
+	}else if(value == -2)
+		ds_control.aidvs_moving_avg_weight = 0;
+	else if(value == -1)
+		ds_control.aidvs_moving_avg_weight = 1;
+	else if(value < 10)
+		ds_control.aidvs_moving_avg_weight = value;
+	else if(value < 1000000)
+		ds_control.aidvs_interval_length = value;
 	else{
-		if(value == -2){
-			ds_control.aidvs_moving_avg_weight = 0;
-		}
-		else if(value == -1){
-			ds_control.aidvs_moving_avg_weight = 1;
-		}
-		else if(value == 1){
-			printk(KERN_WARNING "[LG-DVFS] LG-DVFS is ready to run\n");
-			/* Initialize LG-DVFS upon enabling it */
-			ld_initialize_ds_control();
-			/* Initialice sysfs limits according to actual limits */
-			per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index = (policy->min)*1000;
-			per_cpu(ds_sys_status, 0).sysfs_max_cpu_op_index = (policy->max)*1000;
-			ld_initialize_ds_sys_status();			
-			ld_initialize_ds_cpu_status(DS_CPU_MODE_TASK);
-			ld_initialize_ds_counter();
-			ld_initialize_aidvs();
-			ds_control.on_dvs = 1;
-			dvs_suite_wq = create_workqueue("dvs_suite");
-			dvs_suite_timer_init();
-		}
-		else if(value < 10){
-			ds_control.aidvs_moving_avg_weight = value;
-		}
-		else if(value < 1000000){
-			ds_control.aidvs_interval_length = value;
-		}
-		else{
-			printk(KERN_ERR "store_turn_on_lg_dvfs: Invalid value\n");
-			return -EINVAL;
-		}
+		printk(KERN_ERR "store_turn_on_lg_dvfs: Invalid value\n");
+		return -EINVAL;
 	}
 
     return count;
