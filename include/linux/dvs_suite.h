@@ -445,7 +445,6 @@ extern int ds_do_dvs_gpschedvs(int, unsigned int *);
  * to call the main dvs suite function.
  */
 extern int ld_initialize_ds_control(void);
-extern int ld_initialize_ds_sysfs_status(void);
 extern int ld_initialize_ds_sys_status(void);
 extern int ld_initialize_ds_cpu_status(int);
 extern int ld_initialize_ds_counter(void);
@@ -457,7 +456,6 @@ extern void ld_do_dvs_suite(int);
  * The main dvs suite function.
  */
 extern int ds_initialize_ds_control(void);
-extern int ds_initialize_ds_sysfs_status(void);
 extern int ds_initialize_ds_sys_status(void);
 extern int ds_initialize_ds_cpu_status(int, int);
 extern int ds_initialize_ds_counter(int, int);

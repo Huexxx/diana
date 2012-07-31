@@ -1883,19 +1883,6 @@ int ds_initialize_ds_control(void){
 }
 
 /*====================================================================
-	The functions to initialize dvs_suite_sysfs_status structure.
-	====================================================================*/
-
-int ds_initialize_ds_sysfs_status(void){
-
-	per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index = DS_CPU_OP_INDEX_11; 	// 300 MHz
-	per_cpu(ds_sys_status, 0).sysfs_max_cpu_op_index = DS_CPU_OP_INDEX_4; 	// 1 GHz
-
-	return(0);
-}
-
-
-/*====================================================================
 	The functions to initialize dvs_suite_system_status structure.
 	====================================================================*/
 

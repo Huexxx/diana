@@ -746,7 +746,9 @@ static ssize_t store_turn_on_lg_dvfs(struct cpufreq_policy *policy, const char *
 			printk(KERN_WARNING "[LG-DVFS] LG-DVFS is ready to run\n");
 			/* Initialize LG-DVFS upon enabling it */
 			ld_initialize_ds_control();
-			ld_initialize_ds_sysfs_status();
+			/* Initialice sysfs limits according to actual limits */
+			per_cpu(ds_sys_status, 0).sysfs_min_cpu_op_index = (policy->min)*1000;
+			per_cpu(ds_sys_status, 0).sysfs_max_cpu_op_index = (policy->max)*1000;
 			ld_initialize_ds_sys_status();			
 			ld_initialize_ds_cpu_status(DS_CPU_MODE_TASK);
 			ld_initialize_ds_counter();
