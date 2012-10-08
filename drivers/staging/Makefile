@@ -56,3 +56,5 @@ obj-$(CONFIG_FB_XGI)		+= xgifb/
 obj-$(CONFIG_TOUCHSCREEN_MRSTOUCH)	+= mrst-touchscreen/
 obj-$(CONFIG_MSM_STAGING)	+= msm/
 obj-$(CONFIG_OMAP_HSI)		+= omap_hsi/
+obj-$(CONFIG_ZRAM)              += zram/
+obj-$(CONFIG_XVMALLOC)          += zram/
