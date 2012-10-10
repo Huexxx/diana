@@ -444,6 +444,12 @@ static int ioctl( struct inode *inode, struct file *file, unsigned int cmd, unsi
             		}
             		break;
 
+/* 20110125 jiwon.seo@lge.com for ELT vibrator [START] */
+			case TSPDRV_IN_TEST_MODE:
+				   bInTestMode = arg;
+				   break;
+ /* 20110125 jiwon.seo@lge.com for ELT vibrator [END] */				
+
         	case TSPDRV_GET_NUM_ACTUATORS:
             		return NUM_ACTUATORS;
 

@@ -58,39 +58,14 @@ static bool g_bAmpEnabled = false;
 #define HUB_VIBE_PWM				56
 #define HUB_VIBE_GPTIMER_NUM		10
 
-
-/* LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-03-21, Change the PWM Clock Source */
-#if 0
-#define USE_SYS_CLK
-#undef USE_32_CLK
-#else
-#define USE_32_CLK
-#undef USE_SYS_CLK
-#endif // if 0
-
-#if 0
 #define PWM_DUTY_MAX	 1158 /*1158 /* 22.43 kHz */
-#else
-#ifdef USE_32_CLK
-#define PWM_DUTY_MAX	 0xAEFFFFFF//use 32k clock source ok
-#else
-#define PWM_DUTY_MAX	 0x387638//use sys clock 26MHz source
-#endif // USE_32_CLK
-#endif // if 0
-/* LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-03-21, Change the PWM Clock Source */
-
-
 #define PLTR_VALUE		(0xFFFFFFFF - PWM_DUTY_MAX)
 #define PWM_DUTY_HALF	(0xFFFFFFFF - (PWM_DUTY_MAX >> 1))
 static struct omap_dm_timer *omap_vibrator_timer = NULL;
 
 
-#ifdef USE_SUBPM
-#if defined(CONFIG_REGULATOR_LP8720)
 extern void subpm_set_output(subpm_output_enum outnum, int onoff);
 extern void subpm_output_enable(void);
-#endif
-#endif
 
 static void hub_vibrator_gpio_enable (int enable)
 {
@@ -122,24 +97,14 @@ static void vib_generatePWM(int on)
 	if(on) {
 		/* Select clock */
 		omap_dm_timer_enable(omap_vibrator_timer);
-
-/* LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-03-21, Change the PWM Clock Source */
-#ifdef USE_32_CLK
-		omap_dm_timer_set_source(omap_vibrator_timer, OMAP_TIMER_SRC_32_KHZ);
-#else
 		omap_dm_timer_set_source(omap_vibrator_timer, OMAP_TIMER_SRC_SYS_CLK);
-#endif
-/* LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-03-21, Change the PWM Clock Source */
 
 		/* set a period */
 		omap_dm_timer_set_load(omap_vibrator_timer, 1, PLTR_VALUE);
 
 		/* set a duty */
 		omap_dm_timer_set_match(omap_vibrator_timer, 1, PWM_DUTY_HALF);
-/* LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-03-21, Change the PWM Clock Source */
 		omap_dm_timer_set_pwm(omap_vibrator_timer, 0, 1, OMAP_TIMER_TRIGGER_OVERFLOW_AND_COMPARE);
-		//omap_dm_timer_set_pwm(omap_vibrator_timer, 1, 1, OMAP_TIMER_TRIGGER_OVERFLOW_AND_COMPARE);
-/* LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-03-21, Change the PWM Clock Source */
 		omap_dm_timer_start(omap_vibrator_timer);		
 	}
 	else {
@@ -214,20 +179,26 @@ IMMVIBESPIAPI VibeStatus ImmVibeSPI_ForceOut_Terminate( void )
     	return VIBE_S_SUCCESS;
 }
 
+bool bInTestMode = 0; /* 20110125 jiwon.seo@lge.com for ELT vibrator */
 /*** Called by the real-time loop to set PWM duty cycle, and enable amp if required*/
 IMMVIBESPIAPI VibeStatus ImmVibeSPI_ForceOut_Set( VibeUInt8 nActuatorIndex, VibeInt8 nForce )
 {
-//AnandKumar_EUR_LGP970_TD114610_Start_LGE_Changes
-/* LGE_CHANGE_S, ryu.seeyeol@lge.com, 2011-05-13, This function executes twice.. duplicate vib_generatePWM() */
-#if 0 
 	unsigned int nTmp;
 	
 	DbgOut(( "[ImmVibeSPI] ImmVibeSPI_ForceOut_Set nForce =  %d \n", nForce ));
 
-//#if 1
+#if 1
 	/* Check the Force value with Max and Min force value */
 	if (nForce > 127) nForce = 127;
 	if (nForce < -127) nForce = -127;
+	
+/* 20110125 jiwon.seo@lge.com for ELT vibrator [START] */
+	if(bInTestMode)
+		   {		   
+			 if(nForce > 0 && nForce < 125) 
+			 	nForce = 125; 
+    	}
+/* 20110125 jiwon.seo@lge.com for ELT vibrator [END] */
 	
 	if (nForce == 0) {
 		hub_vibrator_gpio_enable(0);
@@ -235,12 +206,13 @@ IMMVIBESPIAPI VibeStatus ImmVibeSPI_ForceOut_Set( VibeUInt8 nActuatorIndex, Vibe
 	} else {
 		hub_vibrator_gpio_enable(1);
 		nTmp = 0xFFFFFFF7 - (((127 - nForce) * 9) >> 1);
+// bsnoh@ubiquix.com Prevent register access for kernel panic if the timer already disabled[START]		
+		omap_dm_timer_enable(omap_vibrator_timer);
+// bsnoh@ubiquix.com Prevent register access for kernel panic if the timer already disabled[End]	
 		omap_dm_timer_set_match(omap_vibrator_timer, 1, nTmp);
 		omap_dm_timer_start(omap_vibrator_timer);		
 	}
 #endif
-/* LGE_CHANGE_E, ryu.seeyeol@lge.com, 2011-05-13, This function executes twice.. duplicate vib_generatePWM() */
-//AnandKumar_EUR_LGP970_TD114610_End_LGE Changes
 	return VIBE_S_SUCCESS;
 }
 
