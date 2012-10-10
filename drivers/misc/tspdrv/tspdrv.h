@@ -44,6 +44,8 @@
 #define 	VIBE_MAX_DEVICE_NAME_LENGTH	64
 #define 	SPI_HEADER_SIZE				3   	/* DO NOT CHANGE - SPI buffer header size 		*/
 #define 	VIBE_OUTPUT_SAMPLE_SIZE		50  	/* DO NOT CHANGE - maximum number of samples 	*/
+#define     TSPDRV_IN_TEST_MODE          _IO(TSPDRV_MAGIC_NUMBER & 0xFF, 200) /* 20110125 jiwon.seo@lge.com for ELT vibrator */
+
 
 /* Type definitions */
 #ifdef __KERNEL__
