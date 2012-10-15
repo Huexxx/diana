@@ -46,6 +46,7 @@ static struct list_head active_wake_locks[WAKE_LOCK_TYPE_COUNT];
 static int current_event_num;
 struct workqueue_struct *suspend_work_queue;
 struct wake_lock main_wake_lock;
+struct wake_lock no_suspend_wake_lock;
 suspend_state_t requested_suspend_state = PM_SUSPEND_MEM;
 static struct wake_lock unknown_wakeup;
 
@@ -261,11 +262,16 @@ long has_wake_lock(int type)
 	return ret;
 }
 
+#ifdef CONFIG_SYS_SYNC_BLOCKING_DEBUG
+void sys_sync_debug(void);
+#endif
+
 static void suspend(struct work_struct *work)
 {
 	int ret;
 	int entry_event_num;
 
+	pr_info("[R] suspend start\n");
 	if (has_wake_lock(WAKE_LOCK_SUSPEND)) {
 		if (debug_mask & DEBUG_SUSPEND)
 			pr_info("suspend: abort suspend\n");
@@ -273,7 +279,13 @@ static void suspend(struct work_struct *work)
 	}
 
 	entry_event_num = current_event_num;
+
+#ifdef CONFIG_SYS_SYNC_BLOCKING_DEBUG
+	sys_sync_debug();
+#else
 	sys_sync();
+#endif
+
 	if (debug_mask & DEBUG_SUSPEND)
 		pr_info("suspend: enter suspend\n");
 	suspend_resume_statecheck = 0; // LGE_change
@@ -294,6 +306,7 @@ static void suspend(struct work_struct *work)
 			pr_info("suspend: pm_suspend returned with no event\n");
 		wake_lock_timeout(&unknown_wakeup, HZ / 2);
 	}
+	pr_info("[R] resume end\n");
 }
 static DECLARE_WORK(suspend_work, suspend);
 
@@ -555,6 +568,8 @@ static int __init wakelocks_init(void)
 	wake_lock_init(&main_wake_lock, WAKE_LOCK_SUSPEND, "main");
 	wake_lock(&main_wake_lock);
 	wake_lock_init(&unknown_wakeup, WAKE_LOCK_SUSPEND, "unknown_wakeups");
+	wake_lock_init(&no_suspend_wake_lock, WAKE_LOCK_SUSPEND,
+					"no_suspend_wake_lock");
 
 	ret = platform_device_register(&power_device);
 	if (ret) {
@@ -584,6 +599,7 @@ err_suspend_work_queue:
 err_platform_driver_register:
 	platform_device_unregister(&power_device);
 err_platform_device_register:
+	wake_lock_destroy(&no_suspend_wake_lock);
 	wake_lock_destroy(&unknown_wakeup);
 	wake_lock_destroy(&main_wake_lock);
 #ifdef CONFIG_WAKELOCK_STAT
@@ -600,6 +616,7 @@ static void  __exit wakelocks_exit(void)
 	destroy_workqueue(suspend_work_queue);
 	platform_driver_unregister(&power_driver);
 	platform_device_unregister(&power_device);
+	wake_lock_destroy(&no_suspend_wake_lock);
 	wake_lock_destroy(&unknown_wakeup);
 	wake_lock_destroy(&main_wake_lock);
 #ifdef CONFIG_WAKELOCK_STAT
