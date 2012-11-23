@@ -199,6 +199,29 @@ config P970_OPPS_ENABLED
 	depends on MACH_LGE_HUB_REV_A
 	default n
 
+choice
+	prompt "SmartReflex Undervolting Profile"
+	default NON_UV
+
+config NON_UV
+	bool "Non UV"
+	help
+	  This option selects a non-undervolted profile.
+
+config MED_UV
+	bool "Medium UV"
+	help
+	  This option selects a medium-undervolted profile
+	  for < 1000MHz OPPs.
+
+config MAX_UV
+	bool "Maximum UV"
+	help
+	  This option selects a high-undervolted profile
+	  for < 1000MHz OPPs.
+
+endchoice
+
 config MACH_CM_T35
 	bool "CompuLab CM-T35 module"
 	depends on ARCH_OMAP3

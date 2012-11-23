@@ -72,7 +72,11 @@ struct voltagedomain {
  * @sr_errminlimit	: Error min limit value for smartreflex. This value
  *			  differs at differnet opp and thus is linked
  *			  with voltage.
- * @vp_errorgain	: Error gain value for the voltage processor. This
+ * @sr_oppmargin	: Added margin to the safe voltage on calibration
+ *			  process.
+ * @sr_oppextra		: Subtracted margin to the safe voltage on calibration
+ *			  process on ultra low frequency OPPs.
+ * @vp_errgain		: Error gain value for the voltage processor. This
  *			  field also differs according to the voltage/opp.
  * @abb_type		: Bitfield OPP_SEL.PRM_LDO_ABB_CTRL.
  */
@@ -84,6 +88,7 @@ struct omap_volt_data {
 //LGSI_VS910_FroyoToGB DVFS Patch from DCM shidhar.ms@lge.com_03Oct2011_END
 	u32	sr_nvalue;
 	u32	sr_oppmargin;
+	u32	sr_oppextra;
 	u8	sr_errminlimit;
 	u8	vp_errgain;
 	u8	abb_type;

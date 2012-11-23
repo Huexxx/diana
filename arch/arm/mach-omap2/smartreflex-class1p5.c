@@ -291,10 +291,11 @@ done_calib:
 		if (voltage_tweak < -VTWEAK_LEVELS)
 			voltage_tweak = -VTWEAK_LEVELS;
 #if SR_DEBUG	
-		pr_info("%s: %s - volt nominal %d, sr opp margin %d, voltage tweak %d \n",
-			__func__, voltdm->name, volt_data->volt_nominal, volt_data->sr_oppmargin, voltage_tweak*VTWEAK_STEP);
+		pr_info("%s: %s - volt nominal %d, sr opp margin %d, sr opp extra %d, voltage tweak %d \n",
+			__func__, voltdm->name, volt_data->volt_nominal, volt_data->sr_oppmargin, volt_data->sr_oppextra, voltage_tweak*VTWEAK_STEP);
 #endif
 		volt_data->volt_calibrated += volt_data->sr_oppmargin;
+		volt_data->volt_calibrated -= volt_data->sr_oppextra;
 		if (voltage_tweak != 0)
 			volt_data->volt_calibrated += voltage_tweak*VTWEAK_STEP;
 		if (volt_data->volt_calibrated > volt_data->volt_nominal)
